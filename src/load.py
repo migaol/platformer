@@ -1,0 +1,34 @@
+import pygame as pg
+from settings import *
+import os, csv
+
+def import_folder(folder_path):
+    surfaces = []
+    for _, _, filenames in os.walk(folder_path):
+        for file in sorted(filenames):
+            if file.endswith('.png'):
+                img = pg.image.load(os.path.join(folder_path, file)).convert_alpha()
+                surfaces.append(img)
+    return surfaces
+
+def import_csv_layout(folder_path):
+    terrain_map = []
+    with open(folder_path) as map:
+        level = csv.reader(map, delimiter=',')
+        for row in level:
+            terrain_map.append(list(row))
+    return terrain_map
+
+def import_tilesheet(png_path):
+    surface = pg.image.load(png_path).convert_alpha()
+    numx = surface.get_size()[0] // TILE_SIZE
+    numy = surface.get_size()[1] // TILE_SIZE
+
+    cut_tiles = []
+    for r in range(numy):
+        for c in range(numx):
+            x, y = c*TILE_SIZE, r*TILE_SIZE
+            tile = pg.Surface((TILE_SIZE, TILE_SIZE), flags=pg.SRCALPHA)
+            tile.blit(surface, (0, 0), (x, y, TILE_SIZE, TILE_SIZE))
+            cut_tiles.append(tile)
+    return cut_tiles

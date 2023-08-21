@@ -1,7 +1,8 @@
 import pygame as pg
 import load
-from player import Player
 from guibar import GuiBar
+from player import Player
+from particles import ParticleEffect
 from tile import *
 from enemy import *
 from settings import *
@@ -13,6 +14,9 @@ class Level:
 
         self.setup_level(level_data)
         self.view_shift = 0
+
+        self.global_frame_index = 0
+        self.particle_sprites = pg.sprite.Group()
 
     def setup_level(self, layout):
         self.tiles = pg.sprite.Group()
@@ -67,7 +71,12 @@ class Level:
                 player.damage()
     
     def player_vertical_movement(self):
+        player_was_on_ground = self.player.sprite.on_ground
         player = self.player.sprite
+
+        if player.velocity.y == player.jump_speed:
+            self.create_jump_particles()
+        
         player.apply_gravity()
 
         for sprite in self.tiles.sprites():
@@ -76,11 +85,18 @@ class Level:
                     player.rect.bottom = sprite.rect.top
                     player.velocity.y = 0
                     player.on_ground = True
+                    player.jump_cooldown = 0
                     player.jumps = PLAYER_MAX_JUMPS
                 elif player.velocity.y < 0:
                     player.rect.top = sprite.rect.bottom
                     player.velocity.y = 0
                     player.on_ceiling = True
+        
+        if player.on_ground and player.velocity.y < 0 or player.velocity.y > player.gravity:
+            player.on_ground = False
+        if not player_was_on_ground and self.player.sprite.on_ground:
+            player.land()
+            self.create_player_landing_particles()
         
         for enemy in self.enemies.sprites():
             if enemy.rect.colliderect(player.rect):
@@ -111,7 +127,19 @@ class Level:
                         enemy.velocity.y = 0
                         enemy.on_ground = True
 
+    def create_jump_particles(self):
+        x, y = self.player.sprite.rect.midbottom
+        jump_particle = ParticleEffect(x, y, 'player_jumping')
+        self.particle_sprites.add(jump_particle)
+
+    def create_player_landing_particles(self):
+        x, y = self.player.sprite.rect.midbottom
+        landing_particle = ParticleEffect(x, y, 'player_landing')
+        self.particle_sprites.add(landing_particle)
+
     def run(self):
+        self.global_frame_index += DEFAULT_ANIMATION_SPEED
+
         self.scroll_x()
         self.tiles.update(self.view_shift)
         self.tiles.draw(self.display_surface)
@@ -125,6 +153,9 @@ class Level:
         self.player_horizontal_movement()
         self.player_vertical_movement()
         self.player.draw(self.display_surface)
+
+        self.particle_sprites.update(self.view_shift)
+        self.particle_sprites.draw(self.display_surface)
 
         self.guibar.show_base()
         self.guibar.show_healthbar(self.player.sprite.health, self.player.sprite.max_health)

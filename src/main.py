@@ -26,8 +26,8 @@ while True:
 
     screen.fill('black')
     
-    renderspeed(level.run)
-    # level.run()
+    # renderspeed(level.run)
+    level.run()
     
     pg.display.update()
     clock.tick(60)

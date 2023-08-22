@@ -1,6 +1,6 @@
 import pygame as pg
 import load
-from guibar import GuiBar
+from gui import Gui
 from player import Player
 from particles import ParticleEffect
 from tile import *
@@ -10,12 +10,13 @@ from settings import *
 class Level:
     def __init__(self, level_data, surface) -> None:
         self.display_surface = surface
-        self.guibar = GuiBar(self.display_surface, 1)
 
         self.setup_level(level_data)
         self.view_shift = 0
 
-        self.global_frame_index = 0
+        self.gui = Gui(self.display_surface, 1, self.player.sprite)
+
+        self.global_animation_frame = 0
         self.particle_sprites = pg.sprite.Group()
 
     def setup_level(self, layout):
@@ -67,8 +68,9 @@ class Level:
             player.on_right = False
         
         for enemy in self.enemies.sprites():
-            if enemy.rect.colliderect(player.rect):
+            if enemy.rect.colliderect(player.rect) and player.animation_state != 'hurt':
                 player.damage()
+                self.gui.hp_bar.lose_hp(1)
     
     def player_vertical_movement(self):
         player_was_on_ground = self.player.sprite.on_ground
@@ -138,7 +140,7 @@ class Level:
         self.particle_sprites.add(landing_particle)
 
     def run(self):
-        self.global_frame_index += DEFAULT_ANIMATION_SPEED
+        self.global_animation_frame += DEFAULT_ANIMATION_SPEED
 
         self.scroll_x()
         self.tiles.update(self.view_shift)
@@ -153,9 +155,9 @@ class Level:
         self.player_horizontal_movement()
         self.player_vertical_movement()
         self.player.draw(self.display_surface)
+        pg.draw.rect(self.display_surface, (0, 128, 255), self.player.sprite.rect, 2)
 
         self.particle_sprites.update(self.view_shift)
         self.particle_sprites.draw(self.display_surface)
 
-        self.guibar.show_base()
-        self.guibar.show_healthbar(self.player.sprite.health, self.player.sprite.max_health)
+        self.gui.draw()

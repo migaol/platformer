@@ -23,11 +23,13 @@ while True:
         if event.type == pg.QUIT or (event.type == pg.KEYDOWN and event.key == KEY_QUIT):
             pg.quit()
             sys.exit()
+        # if event.type == pg.MOUSEMOTION:
+        #     print(event.pos)
 
     screen.fill('black')
     
-    # renderspeed(level.run)
-    level.run()
+    renderspeed(level.run)
+    # level.run()
     
     pg.display.update()
     clock.tick(60)

@@ -7,7 +7,7 @@ class Tile(pg.sprite.Sprite):
     def __init__(self, x: int, y: int, size: int):
         super().__init__()
         self.image = pg.Surface((size, size))
-        self.rect = self.image.get_rect(topleft = (x,y))
+        self.rect = self.image.get_rect(topleft = (x, y))
 
     def update(self, xshift):
         self.rect.x += xshift

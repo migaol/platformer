@@ -11,6 +11,17 @@ SCREEN_SCROLL_THRESHOLD = SCREEN_WIDTH // 4
 
 # animation
 DEFAULT_ANIMATION_SPEED = 0.2
+PARALLAX_FACTOR = {
+    'background': {
+        'min': 0.1, 'max': 0.3
+    },
+    'midground': {
+        'min': 0.4,'max': 0.6
+    },
+    'foreground': {
+        'min': 0.7,'max': 0.9
+    }
+}
 
 # controls
 KEY_QUIT = pg.K_ESCAPE

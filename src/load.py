@@ -11,6 +11,16 @@ def import_folder(folder_path):
                 surfaces.append(img)
     return surfaces
 
+def import_background_files(folder_path):
+    bg_files = {'static': [], 'background': [], 'midground': [], 'foreground': []}
+    for _, _, filenames in os.walk(folder_path):
+        for file in sorted(filenames):
+            if file.endswith('.png'):
+                for layer_type in bg_files:
+                    if file.startswith(layer_type):
+                        bg_files[layer_type].append(os.path.join(folder_path, file))
+    return bg_files
+
 def import_csv_layout(folder_path):
     terrain_map = []
     with open(folder_path) as map:

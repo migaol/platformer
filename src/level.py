@@ -1,18 +1,23 @@
 import pygame as pg
+import numpy as np
 import load
 from gui import Gui
 from player import Player
 from particles import ParticleEffect
 from tile import *
+from bg import *
 from enemy import *
 from settings import *
 
 class Level:
-    def __init__(self, level_data, surface) -> None:
+    def __init__(self, level_data, surface: pg.Surface, debug_mode: bool = False) -> None:
         self.display_surface = surface
+        self.debug_mode = debug_mode
 
         self.setup_level(level_data)
+        self.setup_background()
         self.view_shift = 0
+        self.player_movement = pg.Vector2(0, 0)
 
         self.gui = Gui(self.display_surface, 1, self.player.sprite)
 
@@ -35,6 +40,21 @@ class Level:
                 elif c == 's':
                     self.enemies.add(Zombie(x, y, self.display_surface))
 
+    def setup_background(self):
+        bg_files = load.import_background_files('./assets/background/1')
+        composite_layers = []
+        for layer_type in bg_files:
+            bg_layers = bg_files[layer_type]
+            if layer_type =='static':
+                for layer_png in bg_layers:
+                    composite_layers.append(StaticBackground(0, SCREEN_HEIGHT, layer_png))
+            elif layer_type in ['background', 'midground','foreground']:
+                parallax_factors = np.linspace(PARALLAX_FACTOR[layer_type]['min'], PARALLAX_FACTOR[layer_type]['max'], len(bg_layers))
+                for i, layer_png in enumerate(bg_layers):
+                    composite_layers.append(ParallaxBackground(pg.Vector2(0, 0), SCREEN_HEIGHT, parallax_factors[i], layer_png))
+        
+        self.background = pg.sprite.Group(*composite_layers)
+
     def scroll_x(self):
         player = self.player.sprite
         player_x = player.rect.centerx
@@ -42,13 +62,16 @@ class Level:
 
         if player_x < SCREEN_SCROLL_THRESHOLD and direction_x < 0:
             self.view_shift = -direction_x
+            self.player_movement.x = -self.view_shift
         elif player_x > SCREEN_WIDTH - SCREEN_SCROLL_THRESHOLD and direction_x > 0:
             self.view_shift = -direction_x
+            self.player_movement.x = -self.view_shift
         else:
             self.view_shift = 0
 
     def player_horizontal_movement(self):
         player = self.player.sprite
+        # player_prev_x = player.velocity.x
         if self.view_shift == 0:
             player.rect.x += player.velocity.x
 
@@ -66,6 +89,11 @@ class Level:
             player.on_left = False
         if player.on_right and (player.rect.right > self.collision_point_x or player.velocity.x <= 0):
             player.on_right = False
+        
+        if (not player.on_left) and (not player.on_right):
+            self.player_movement.x = player.velocity.x
+        else:
+            self.player_movement.x = 0
         
         for enemy in self.enemies.sprites():
             if enemy.rect.colliderect(player.rect) and player.animation_state != 'hurt':
@@ -143,6 +171,9 @@ class Level:
         self.global_animation_frame += DEFAULT_ANIMATION_SPEED
 
         self.scroll_x()
+        self.background.update(self.player_movement)
+        self.background.draw(self.display_surface)
+
         self.tiles.update(self.view_shift)
         self.tiles.draw(self.display_surface)
 
@@ -155,7 +186,8 @@ class Level:
         self.player_horizontal_movement()
         self.player_vertical_movement()
         self.player.draw(self.display_surface)
-        pg.draw.rect(self.display_surface, (0, 128, 255), self.player.sprite.rect, 2)
+        if self.debug_mode:
+            pg.draw.rect(self.display_surface, (0, 128, 255), self.player.sprite.rect, 2)
 
         self.particle_sprites.update(self.view_shift)
         self.particle_sprites.draw(self.display_surface)

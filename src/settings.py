@@ -9,18 +9,19 @@ SCREEN_WIDTH = 1600
 SCREEN_HEIGHT = TILE_SIZE * VERTICAL_TILES
 SCREEN_SCROLL_THRESHOLD = SCREEN_WIDTH // 4
 
+# debug
+HITBOX_COLOR = (0, 128, 255)
+LETHAL_HITBOX_COLOR = (255, 0, 0)
+
 # animation
 DEFAULT_ANIMATION_SPEED = 0.2
 PARALLAX_FACTOR = {
     'background': {
-        'min': 0.1, 'max': 0.3
-    },
+        'min': 0.1, 'max': 0.3},
     'midground': {
-        'min': 0.4,'max': 0.6
-    },
+        'min': 0.4,'max': 0.6},
     'foreground': {
-        'min': 0.7,'max': 0.9
-    }
+        'min': 0.7,'max': 0.9}
 }
 
 # controls
@@ -47,4 +48,4 @@ PLAYER_TERMINAL_VELOCITY = 10
 
 # enemy behavior
 ENEMY_DUMMY_SPEED = 5
-ENEMY_ZOMBIE_SPEED = 2
+ENEMY_BASIC_SPEED = 2

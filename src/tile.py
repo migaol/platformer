@@ -16,6 +16,7 @@ class BlankTile(Tile):
     def __init__(self, x: int, y: int, size: int, color: str):
         super().__init__(x, y, size)
         self.image.fill(color)
+        self.image = pg.image.load('./assets/test_direction.png')
 
 class StaticTile(Tile):
     def __init__(self, x: int, y: int, size: int, surface: pg.Surface):

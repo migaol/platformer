@@ -9,7 +9,7 @@ pg.init()
 screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), flags=pg.SCALED, vsync=1)
 clock = pg.time.Clock()
 
-level = Level(level_data=test_level, surface=screen)
+level = Level(level_data=test_level, surface=screen, debug_mode=True)
 
 tracemalloc.start()
 slowest = [0]

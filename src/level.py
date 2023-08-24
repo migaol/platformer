@@ -36,9 +36,13 @@ class Level:
                 elif c == 'p':
                     self.player.add(Player(x, y, self.display_surface))
                 elif c == 'z':
-                    self.enemies.add(Zombie(x, y, self.display_surface))
+                    enemy = BasicEnemy(x, y, self.display_surface)
+                    enemy.set_lethal_hitbox(0, 0, 0, 0)
+                    self.enemies.add(enemy)
                 elif c == 's':
-                    self.enemies.add(Zombie(x, y, self.display_surface))
+                    enemy = BasicEnemy(x, y, self.display_surface)
+                    enemy.set_lethal_hitbox(0, 0.5, 0, 0)
+                    self.enemies.add(enemy)
 
     def setup_background(self):
         bg_files = load.import_background_files('./assets/background/1')
@@ -71,7 +75,6 @@ class Level:
 
     def player_horizontal_movement(self):
         player = self.player.sprite
-        # player_prev_x = player.velocity.x
         if self.view_shift == 0:
             player.rect.x += player.velocity.x
 
@@ -94,18 +97,13 @@ class Level:
             self.player_movement.x = player.velocity.x
         else:
             self.player_movement.x = 0
-        
-        for enemy in self.enemies.sprites():
-            if enemy.rect.colliderect(player.rect) and player.animation_state != 'hurt':
-                player.damage()
-                self.gui.hp_bar.lose_hp(1)
     
     def player_vertical_movement(self):
         player_was_on_ground = self.player.sprite.on_ground
         player = self.player.sprite
 
         if player.velocity.y == player.jump_speed:
-            self.create_jump_particles()
+            self.create_player_jump_particles()
         
         player.apply_gravity()
 
@@ -125,12 +123,18 @@ class Level:
         if player.on_ground and player.velocity.y < 0 or player.velocity.y > player.gravity:
             player.on_ground = False
         if not player_was_on_ground and self.player.sprite.on_ground:
-            player.land()
-            self.create_player_landing_particles()
-        
+            if player.animation_state != 'hurt':
+                player.land()
+            self.create_player_land_particles()
+
+    def player_enemy_collision(self):
+        player = self.player.sprite
         for enemy in self.enemies.sprites():
-            if enemy.rect.colliderect(player.rect):
-                if player.velocity.y > 0:
+            if enemy.rect.colliderect(player.rect) and player.animation_state != 'hurt':
+                if enemy.collide_lethal_hitbox(player.rect):
+                    player.damage()
+                    self.gui.hp_bar.lose_hp(1)
+                else:
                     player.rect.bottom = enemy.rect.top
                     player.jump()
                     player.jumps += 1
@@ -157,15 +161,22 @@ class Level:
                         enemy.velocity.y = 0
                         enemy.on_ground = True
 
-    def create_jump_particles(self):
+    def create_player_jump_particles(self):
         x, y = self.player.sprite.rect.midbottom
         jump_particle = ParticleEffect(x, y, 'player_jumping')
         self.particle_sprites.add(jump_particle)
 
-    def create_player_landing_particles(self):
+    def create_player_land_particles(self):
         x, y = self.player.sprite.rect.midbottom
         landing_particle = ParticleEffect(x, y, 'player_landing')
         self.particle_sprites.add(landing_particle)
+
+    def draw_debug_hitbox(self, hitbox: pg.Rect, type: str, stroke: int = 4):
+        if type == 'hitbox':
+            color = HITBOX_COLOR
+        elif type == 'lethal':
+            color = LETHAL_HITBOX_COLOR
+        pg.draw.rect(self.display_surface, color, hitbox, stroke)
 
     def run(self):
         self.global_animation_frame += DEFAULT_ANIMATION_SPEED
@@ -185,11 +196,16 @@ class Level:
         self.player.update()
         self.player_horizontal_movement()
         self.player_vertical_movement()
+        self.player_enemy_collision()
         self.player.draw(self.display_surface)
-        if self.debug_mode:
-            pg.draw.rect(self.display_surface, (0, 128, 255), self.player.sprite.rect, 2)
 
         self.particle_sprites.update(self.view_shift)
         self.particle_sprites.draw(self.display_surface)
 
         self.gui.draw()
+
+        if self.debug_mode:
+            self.draw_debug_hitbox(self.player.sprite.rect, 'hitbox')
+            for enemy in self.enemies.sprites():
+                self.draw_debug_hitbox(enemy.rect, 'hitbox')
+                self.draw_debug_hitbox(enemy.get_lethal_hitbox(), 'lethal')

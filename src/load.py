@@ -1,8 +1,9 @@
 import pygame as pg
-from settings import *
 import os, csv
+from typing import List
+from settings import *
 
-def import_folder(folder_path):
+def import_folder(folder_path: str) -> List[pg.Surface]:
     surfaces = []
     for _, _, filenames in os.walk(folder_path):
         for file in sorted(filenames):
@@ -11,7 +12,7 @@ def import_folder(folder_path):
                 surfaces.append(img)
     return surfaces
 
-def import_background_files(folder_path):
+def import_background_files(folder_path: str) -> List[str]:
     bg_files = {'static': [], 'background': [], 'midground': [], 'foreground': []}
     for _, _, filenames in os.walk(folder_path):
         for file in sorted(filenames):
@@ -21,7 +22,7 @@ def import_background_files(folder_path):
                         bg_files[layer_type].append(os.path.join(folder_path, file))
     return bg_files
 
-def import_csv_layout(folder_path):
+def import_csv_layout(folder_path: str) -> List[List[str]]:
     terrain_map = []
     with open(folder_path) as map:
         level = csv.reader(map, delimiter=',')
@@ -29,7 +30,7 @@ def import_csv_layout(folder_path):
             terrain_map.append(list(row))
     return terrain_map
 
-def import_tilesheet(png_path):
+def import_tilesheet(png_path: str) -> List[pg.Surface]:
     surface = pg.image.load(png_path).convert_alpha()
     numx = surface.get_size()[0] // TILE_SIZE
     numy = surface.get_size()[1] // TILE_SIZE

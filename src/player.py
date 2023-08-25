@@ -3,7 +3,7 @@ from settings import *
 import load
 
 class Player(pg.sprite.Sprite):
-    def __init__(self, x: int, y: int, surface: pg.Surface):
+    def __init__(self, pos: pg.Vector2, surface: pg.Surface):
         super().__init__()
         self.display_surface = surface
 
@@ -12,7 +12,7 @@ class Player(pg.sprite.Sprite):
         self.animation_state = 'idle'
         self.animation_frame = 0
         self.image = self.animations['idle'][0]
-        self.rect = self.image.get_rect(topleft = (x,y))
+        self.rect = self.image.get_rect(topleft = pos)
 
         self.current_hp = PLAYER_HEALTH
         self.max_hp = PLAYER_MAX_HEALTH

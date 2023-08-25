@@ -11,14 +11,14 @@ class Background(pg.sprite.Sprite):
 class StaticBackground(Background):
     def __init__(self, y: int, height: int, png_path: str):
         super().__init__(y, height)
-        self.image = pg.image.load(png_path).convert_alpha()
+        self.image = pg.image.load(png_path).convert()
         self.image = pg.transform.scale(self.image, (SCREEN_WIDTH, height))
         self.rect = self.image.get_rect(topleft = (0, y))
 
 class DynamicBackground(Background):
     def __init__(self, pos: pg.Vector2, height: int, parallax_factor: int, png_path: str):
         super().__init__(pos.y, height)
-        self.image = pg.image.load(png_path).convert_alpha()
+        self.image = pg.image.load(png_path).convert()
         self.image = pg.transform.scale(self.image, (SCREEN_WIDTH, height))
         self.rect = self.image.get_rect(topleft = pos)
         self.parallax_factor = parallax_factor

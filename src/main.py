@@ -5,11 +5,13 @@ from settings import *
 from leveldata import *
 import tracemalloc
 
+debug_mode = True
+
 pg.init()
 screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), flags=pg.SCALED, vsync=1)
 clock = pg.time.Clock()
 
-level = Level(level_data=test_level, surface=screen, debug_mode=True)
+level = Level(level_data=level_1, surface=screen, debug_mode=debug_mode)
 
 tracemalloc.start()
 slowest = [0]
@@ -26,11 +28,11 @@ while True:
         if event.type == pg.QUIT or (event.type == pg.KEYDOWN and event.key == KEY_QUIT):
             pg.quit()
             sys.exit()
-        # if event.type == pg.MOUSEMOTION:
-        #     print(event.pos)
+        if debug_mode and event.type == pg.MOUSEMOTION:
+            print(event.pos)
     
-    # renderspeed(level.run)
-    level.run()
+    if debug_mode: renderspeed(level.run)
+    else: level.run()
     
     pg.display.update()
     clock.tick(60)

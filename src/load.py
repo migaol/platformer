@@ -1,5 +1,5 @@
 import pygame as pg
-import os, csv
+import os, csv, re
 from typing import List
 from settings import *
 
@@ -30,16 +30,26 @@ def import_csv_layout(folder_path: str) -> List[List[str]]:
             terrain_map.append(list(row))
     return terrain_map
 
-def import_tilesheet(png_path: str) -> List[pg.Surface]:
+def get_spritesheet(folder_path: str, id: int) -> (str, int, int):
+    for _, _, filenames in os.walk(folder_path):
+        for file in sorted(filenames):
+            if re.match(r"^frames.*\.png$", file):
+                params = file.split('-')
+                if int(params[1].split('_')[0]) == id:
+                    frame_width = int(params[3].removesuffix('px'))
+                    frame_height = int(params[4].removesuffix('px.png'))
+                    return os.path.join(folder_path, file), frame_width, frame_height
+
+def import_tilesheet(png_path: str, frame_width: int = TILE_SIZE, frame_height: int = TILE_SIZE) -> List[pg.Surface]:
     surface = pg.image.load(png_path).convert_alpha()
-    numx = surface.get_size()[0] // TILE_SIZE
-    numy = surface.get_size()[1] // TILE_SIZE
+    numx = surface.get_size()[0] // frame_width
+    numy = surface.get_size()[1] // frame_height
 
     cut_tiles = []
     for r in range(numy):
         for c in range(numx):
-            x, y = c*TILE_SIZE, r*TILE_SIZE
-            tile = pg.Surface((TILE_SIZE, TILE_SIZE), flags=pg.SRCALPHA)
-            tile.blit(surface, (0, 0), (x, y, TILE_SIZE, TILE_SIZE))
+            x, y = c*frame_width, r*frame_height
+            tile = pg.Surface((frame_width, frame_height), flags=pg.SRCALPHA)
+            tile.blit(surface, (0, 0), (x, y, frame_width, frame_height))
             cut_tiles.append(tile)
     return cut_tiles

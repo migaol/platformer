@@ -3,15 +3,15 @@ from settings import *
 import load
 
 class LethalHitbox:
-    def __init__(self, x: int, y: int, w: int, h: int):
-        self.x, self.y = x, y
+    def __init__(self, pos: pg.Vector2, w: int, h: int):
+        self.x, self.y = pos
         self.w, self.h = w, h
 
 class Enemy(pg.sprite.Sprite):
-    def __init__(self, x: int, y: int, surface: pg.Surface):
+    def __init__(self, pos: pg.Vector2, surface: pg.Surface):
         super().__init__()
         self.image = pg.image.load('./assets/test_direction.png').convert_alpha()
-        self.rect = self.image.get_rect(topleft = (x,y))
+        self.rect = self.image.get_rect(topleft = (pos))
         self.lethal_hitbox = LethalHitbox(0, self.rect.h//2, self.rect.w, self.rect.h//2)
 
         self.display_surface = surface
@@ -51,9 +51,9 @@ class Enemy(pg.sprite.Sprite):
         self.rect.x += view_shift
 
 class BasicEnemy(Enemy):
-    def __init__(self, x: int, y: int, surface: pg.Surface):
-        super().__init__(x, y, surface)
+    def __init__(self, pos: pg.Vector2, surface: pg.Surface):
+        super().__init__(pos, surface)
         self.image = pg.image.load('./assets/test_direction.png').convert_alpha()
-        self.rect = self.image.get_rect(topleft = (x,y))
+        self.rect = self.image.get_rect(topleft = (pos))
 
         self.velocity.x = ENEMY_BASIC_SPEED

@@ -1,5 +1,6 @@
 import pygame as pg
 import numpy as np
+from PIL import Image
 from typing import List
 import load
 from gui import Gui
@@ -31,24 +32,34 @@ class Level:
 
         self.terrain_tiles = self.create_tile_group(
             load.import_csv_layout(level_data['terrain']), level_data['assets_path'], 'terrain')
-        self.foliage_tiles = self.create_tile_group(
-            load.import_csv_layout(level_data['foliage']), level_data['assets_path'], 'foliage')
+        self.animated_z1 = self.create_tile_group(
+            load.import_csv_layout(level_data['animated_z1']), level_data['assets_path'], 'animated_z1')
+        self.static_z1 = self.create_tile_group(
+            load.import_csv_layout(level_data['static_z1']), level_data['assets_path'],'static_z1')
 
     def create_tile_group(self, layout: List[List[str]], folder_path: str, type: str) -> pg.sprite.Group:
         sprite_group = pg.sprite.Group()
+        terrain_tiles = load.import_tilesheet(folder_path + 'terrain.png')
+        static_tiles, img_filenames = load.import_folder(folder_path + 'static')
         for ri, r in enumerate(layout):
             for ci, c in enumerate(r):
                 if c == '-1': continue
                 pos = pg.Vector2(ci*TILE_SIZE, ri*TILE_SIZE)
                 c = int(c)
                 if type == 'terrain':
-                    terrain_tiles = load.import_tilesheet(folder_path + 'terrain.png')
                     tile_img = terrain_tiles[c]
                     sprite = StaticSquareTile(pos, TILE_SIZE, tile_img)
-                elif type == 'foliage':
-                    png_path, frame_width, frame_height = load.get_spritesheet(folder_path + 'foliage', c)
+                elif type == 'animated_z1':
+                    png_path, frame_width, frame_height = load.get_spritesheet(folder_path + 'animated', c)
                     animation_frames = load.import_tilesheet(png_path, frame_width, frame_height)
+                    pos = pg.Vector2(ci*TILE_SIZE, (ri+1)*TILE_SIZE - frame_height)
                     sprite = AnimatedTile(pos, frame_width, frame_height, animation_frames)
+                elif type == 'static_z1':
+                    image = Image.open(img_filenames[c])
+                    image_width = image.width
+                    image_height = image.height
+                    pos = pg.Vector2(ci*TILE_SIZE, (ri+1)*TILE_SIZE - image_height)
+                    sprite = StaticTile(pos, image_width, image_height, static_tiles[c])
                 sprite_group.add(sprite)
         return sprite_group
 
@@ -70,7 +81,7 @@ class Level:
                     self.enemies.add(enemy)
 
     def setup_background(self):
-        bg_files = load.import_background_files('./assets/background/1')
+        bg_files = load.import_background_files('./assets/level/level_1/background')
         composite_layers = []
         for layer_type in bg_files:
             bg_layers = bg_files[layer_type]
@@ -213,8 +224,10 @@ class Level:
         self.terrain_tiles.update(self.view_shift)
         self.terrain_tiles.draw(self.display_surface)
 
-        self.foliage_tiles.update(self.view_shift, self.global_animation_frame)
-        self.foliage_tiles.draw(self.display_surface)
+        self.animated_z1.update(self.view_shift, self.global_animation_frame)
+        self.animated_z1.draw(self.display_surface)
+        self.static_z1.update(self.view_shift, self.global_animation_frame)
+        self.static_z1.draw(self.display_surface)
 
         self.enemies.update(self.view_shift)
         self.enemy_horizontal_movement()

@@ -18,5 +18,6 @@ test_level = [
 level_1 = {
     'assets_path': './assets/level/level_1/',
     'terrain': './leveldata/1/1-1/1-1_terrain.csv',
-    'foliage': './leveldata/1/1-1/1-1_foliage.csv'
+    'animated_z1': './leveldata/1/1-1/1-1_animated_z1.csv',
+    'static_z1': './leveldata/1/1-1/1-1_static_z1.csv'
 }

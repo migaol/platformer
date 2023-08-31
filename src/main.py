@@ -14,14 +14,20 @@ clock = pg.time.Clock()
 level = Level(level_data=level_1, surface=screen, debug_mode=debug_mode)
 
 tracemalloc.start()
-slowest = [0]
+speed = {'slowest': 0, 'avg': 0, 'frames': 0}
 def renderspeed(run):
     t1 = time.time()
     run()
     t2 = time.time()
     current_mem, peak_mem = tracemalloc.get_traced_memory()
-    slowest[0] = max(t2-t1, slowest[0])
-    print(f'current: {(t2-t1)*1000:.4f}ms  {current_mem/100:.3f}kb  peak: {slowest[0]*1000:.4f}ms  {peak_mem/100:.3f}kb')
+    speed['slowest'] = max(t2-t1, speed['slowest'])
+    speed['avg'] = (speed['avg'] * speed['frames'] + (t2-t1)*1000) / (speed['frames'] + 1)
+    speed['frames'] += 1
+    print(f"frames: {speed['frames']}  " +
+            f"TIME current: {(t2-t1)*1000:.4f}ms  " +
+            f"avg: {speed['avg']:.4f}ms  " +
+            f"peak: {speed['slowest']*1000:.4f}ms  " +
+            f"MEMORY current: {current_mem/100:.3f}kb  peak: {peak_mem/100:.3f}kb")
 
 while True:
     for event in pg.event.get():

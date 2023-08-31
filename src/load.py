@@ -5,12 +5,15 @@ from settings import *
 
 def import_folder(folder_path: str) -> List[pg.Surface]:
     surfaces = []
+    img_filenames = []
     for _, _, filenames in os.walk(folder_path):
         for file in sorted(filenames):
             if file.endswith('.png'):
-                img = pg.image.load(os.path.join(folder_path, file)).convert_alpha()
+                img_filename = os.path.join(folder_path, file)
+                img = pg.image.load(img_filename).convert_alpha()
+                img_filenames.append(img_filename)
                 surfaces.append(img)
-    return surfaces
+    return surfaces, img_filenames
 
 def import_background_files(folder_path: str) -> List[str]:
     bg_files = {'static': [], 'background': [], 'midground': [], 'foreground': []}

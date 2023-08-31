@@ -33,13 +33,21 @@ class Tile(pg.sprite.Sprite):
     def update(self, xshift):
         self.rect.x += xshift
 
+class StaticTile(Tile):
+    def __init__(self, pos: pg.Vector2, width: int, height: int, image: pg.Surface):
+        super().__init__(pos, width, height)
+        self.image = image
+        self.rect = self.image.get_rect(topleft = pos)
+
+    def update(self, xshift: int, global_animation_frame: float):
+        self.rect.x += xshift
+
 class AnimatedTile(Tile):
     def __init__(self, pos: pg.Vector2, width: int, height: int, animation_frames: List[pg.Surface]):
         super().__init__(pos, width, height)
         self.animation_frames = animation_frames
         self.frame_offset = random.randint(0, len(self.animation_frames)-1)
         self.image = self.animation_frames[self.frame_offset]
-        print(self.image.get_width(), self.image.get_height())
         self.rect = self.image.get_rect(topleft = pos)
 
     def animate(self, global_animation_frame: float):

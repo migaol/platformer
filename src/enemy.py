@@ -50,7 +50,7 @@ class Enemy(pg.sprite.Sprite):
     def update(self, view_shift: int):
         self.rect.x += view_shift
 
-class BasicEnemy(Enemy):
+class TestEnemy(Enemy):
     def __init__(self, pos: pg.Vector2, surface: pg.Surface):
         super().__init__(pos, surface)
         self.image = pg.image.load('./assets/test_direction.png').convert_alpha()

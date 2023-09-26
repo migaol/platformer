@@ -1,6 +1,7 @@
 import pygame as pg
 import numpy as np
 from PIL import Image
+import random
 from typing import List
 import load
 from gui import Gui
@@ -13,6 +14,7 @@ from settings import *
 
 class Level:
     def __init__(self, level_data, surface: pg.Surface, debug_mode: bool = False) -> None:
+        random.seed(1)
         self.display_surface = surface
         self.debug_mode = debug_mode
 
@@ -36,6 +38,8 @@ class Level:
             load.import_csv_layout(level_data['animated_z1']), level_data['assets_path'], 'animated_z1')
         self.static_z1 = self.create_tile_group(
             load.import_csv_layout(level_data['static_z1']), level_data['assets_path'],'static_z1')
+        self.static_z2 = self.create_tile_group(
+            load.import_csv_layout(level_data['static_z2']), level_data['assets_path'],'static_z2')
 
     def create_tile_group(self, layout: List[List[str]], folder_path: str, type: str) -> pg.sprite.Group:
         sprite_group = pg.sprite.Group()
@@ -49,12 +53,12 @@ class Level:
                 if type == 'terrain':
                     tile_img = terrain_tiles[c]
                     sprite = StaticSquareTile(pos, TILE_SIZE, tile_img)
-                elif type == 'animated_z1':
+                elif type.startswith('animated_'):
                     png_path, frame_width, frame_height = load.get_spritesheet(folder_path + 'animated', c)
                     animation_frames = load.import_tilesheet(png_path, frame_width, frame_height)
                     pos = pg.Vector2(ci*TILE_SIZE, (ri+1)*TILE_SIZE - frame_height)
                     sprite = AnimatedTile(pos, frame_width, frame_height, animation_frames)
-                elif type == 'static_z1':
+                elif type.startswith('static_'):
                     image = Image.open(img_filenames[c])
                     image_width = image.width
                     image_height = image.height
@@ -72,11 +76,11 @@ class Level:
                 if c == 'p':
                     self.player.add(Player(x, y, self.display_surface))
                 elif c == 'z':
-                    enemy = BasicEnemy(x, y, self.display_surface)
+                    enemy = TestEnemy(x, y, self.display_surface)
                     enemy.set_lethal_hitbox(0, 0, 0, 0)
                     self.enemies.add(enemy)
                 elif c == 's':
-                    enemy = BasicEnemy(x, y, self.display_surface)
+                    enemy = TestEnemy(x, y, self.display_surface)
                     enemy.set_lethal_hitbox(0, 0.5, 0, 0)
                     self.enemies.add(enemy)
 
@@ -228,6 +232,8 @@ class Level:
         self.animated_z1.draw(self.display_surface)
         self.static_z1.update(self.view_shift, self.global_animation_frame)
         self.static_z1.draw(self.display_surface)
+        self.static_z2.update(self.view_shift, self.global_animation_frame)
+        self.static_z2.draw(self.display_surface)
 
         self.enemies.update(self.view_shift)
         self.enemy_horizontal_movement()
@@ -244,6 +250,7 @@ class Level:
         self.particle_sprites.draw(self.display_surface)
 
         self.gui.draw()
+        print(self.player.sprite.animation_state)
 
         if self.debug_mode:
             self.draw_debug_hitbox(self.player.sprite.rect, 'hitbox')

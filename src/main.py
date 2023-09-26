@@ -1,5 +1,6 @@
 import pygame as pg
 import sys, time
+from typing import Tuple
 from level import Level
 from level_menu import LevelMenu
 from settings import *
@@ -14,33 +15,45 @@ class Game:
         self.debug_mode = debug_mode
 
         self.unlocked_levels = [0]
+        self.current_level = (1,1)
 
         self.level_menu = LevelMenu(self.surface, self.debug_mode)
-        self.status = 'level_menu'
+        self.display_mode = 'level_menu'
         
         self.player_lives = PLAYER_LIVES
         self.player_max_health = PLAYER_MAX_HEALTH
         self.player_current_health = PLAYER_MAX_HEALTH
         self.coins = 0
 
-    def create_level(self, level: Level):
-        self.level = Level(level_data=level, surface=screen, debug_mode=debug_mode)
-        self.status = 'level'
+    def create_level(self):
+        level_id = level_data[self.current_level[0]-1]['levels'][self.current_level[1]-1]
+        self.level = Level(level_data=level_id, surface=screen, debug_mode=debug_mode)
+        self.display_mode = 'level'
 
     def add_health(self, amount: int):
         self.player_current_health += amount
+
+    def get_input(self):
+        pressed = pg.key.get_pressed()
+        if pressed[KEY_SELECT]:
+            self.create_level()
+
+    def click(self, pos: Tuple):
+        if self.display_mode == 'level_menu':
+            self.create_level()
 
     def check_game_over(self):
         if self.player_current_health <= 0:
             self.player_current_health = PLAYER_MAX_HEALTH
             self.coins = 0
             self.level_menu = LevelMenu()
-            self.status = 'level_menu'
+            self.display_mode = 'level_menu'
 
     def run(self):
-        if self.status == 'level_menu':
+        if self.display_mode == 'level_menu':
             self.level_menu.run()
-        elif self.status == 'level':
+            self.get_input()
+        elif self.display_mode == 'level':
             self.level.run()
             self.check_game_over()
 
@@ -48,7 +61,6 @@ pg.init()
 screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), flags=pg.SCALED, vsync=1)
 clock = pg.time.Clock()
 game = Game(screen, debug_mode)
-# game.create_level(level_1)
 
 tracemalloc.start()
 speed = {'slowest': 0, 'avg': 0, 'frames': 0}
@@ -73,6 +85,8 @@ while True:
             sys.exit()
         if debug_mode and event.type == pg.MOUSEMOTION:
             print(event.pos)
+        if event.type == pg.MOUSEBUTTONUP:
+            game.click(event.pos)
     
     if debug_mode: renderspeed(game.run)
     else: game.run()

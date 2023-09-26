@@ -26,11 +26,15 @@ PARALLAX_FACTOR = {
 
 # controls
 KEY_QUIT = pg.K_ESCAPE
+KEY_SELECT = pg.K_SPACE
+# controls - player
 KEY_LEFT = pg.K_a
 KEY_RIGHT = pg.K_d
 KEY_JUMP = pg.K_SPACE
 KEY_SPRINT = pg.K_w
 KEY_SNEAK = pg.K_s
+KEY_UP = pg.K_w
+KEY_DOWN = pg.K_s
 
 # player behavior
 PLAYER_LIVES = 5

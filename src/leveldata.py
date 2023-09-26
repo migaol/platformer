@@ -15,10 +15,19 @@ test_level = [
     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
 ]
 
-level_1 = {
+level_1_1 = {
     'assets_path':  './assets/level/level_1/',
     'terrain':      './leveldata/1/1-1/1-1_terrain.csv',
     'animated_z1':  './leveldata/1/1-1/1-1_animated_z1.csv',
     'static_z1':    './leveldata/1/1-1/1-1_static_z1.csv',
     'static_z2':    './leveldata/1/1-1/1-1_static_z2.csv'
 }
+
+level_data = [
+    {
+        'map': 'assets/test_levelmap.png',
+        'levels': [
+            level_1_1
+        ]
+    }
+]

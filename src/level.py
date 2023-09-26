@@ -250,7 +250,6 @@ class Level:
         self.particle_sprites.draw(self.display_surface)
 
         self.gui.draw()
-        print(self.player.sprite.animation_state)
 
         if self.debug_mode:
             self.draw_debug_hitbox(self.player.sprite.rect, 'hitbox')

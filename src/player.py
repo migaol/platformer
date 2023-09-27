@@ -93,6 +93,7 @@ class Player(pg.sprite.Sprite):
         else:
             animation_frame = int(self.animation_frame) % len(animation)
         
+        print(self.animation_state, self.animation_frame, animation_frame)
         image = animation[int(animation_frame)]
         self.image = image if self.facing_right else pg.transform.flip(image, True, False)
 
@@ -132,7 +133,7 @@ class Player(pg.sprite.Sprite):
             return
         if self.velocity.y != 0:
             if ((self.animation_state != 'jump' and self.animation_state != 'land')
-                or self.animation_frame >= len(self.animations['jump'])):
+                or self.animation_frame >= len(self.animations['jump']) - DEFAULT_ANIMATION_SPEED):
                 self.animation_state = 'airborne'
         elif self.velocity.x != 0:
             if self.speed_mode == PLAYER_SPRINT_MULTIPLIER:

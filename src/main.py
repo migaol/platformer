@@ -7,7 +7,7 @@ from settings import *
 from leveldata import *
 import tracemalloc
 
-debug_mode = True
+debug_mode = False
 
 class Game:
     def __init__(self, surface: pg.Surface, debug_mode: bool = False):

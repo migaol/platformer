@@ -93,7 +93,6 @@ class Player(pg.sprite.Sprite):
         else:
             animation_frame = int(self.animation_frame) % len(animation)
         
-        print(self.animation_state, self.animation_frame, animation_frame)
         image = animation[int(animation_frame)]
         self.image = image if self.facing_right else pg.transform.flip(image, True, False)
 

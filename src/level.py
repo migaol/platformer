@@ -22,10 +22,7 @@ class Level:
         self.view_shift = 0
         self.player_movement = pg.Vector2(0, 0)
 
-        self.player = pg.sprite.GroupSingle()
-        self.enemies = pg.sprite.Group()
-        pos = pg.Vector2(2*TILE_SIZE, 2*TILE_SIZE)
-        self.player.add(Player(pos, self.display_surface))
+        self.setup_entities(load.import_csv_layout(level_data['entities']))
 
         self.gui = Gui(self.display_surface, 1, self.player.sprite)
 
@@ -67,21 +64,17 @@ class Level:
                 sprite_group.add(sprite)
         return sprite_group
 
-    def setup_level(self, layout: List[List[str]]):
+    def setup_entities(self, layout: List[List[str]]):
         self.player = pg.sprite.GroupSingle()
         self.enemies = pg.sprite.Group()
         for ri,r in enumerate(layout):
             for ci,c in enumerate(r):
                 x, y = ci*TILE_SIZE, ri*TILE_SIZE
-                if c == 'p':
-                    self.player.add(Player(x, y, self.display_surface))
+                if c == '0':
+                    self.player.add(Player((x,y), self.display_surface))
                 elif c == 'z':
                     enemy = TestEnemy(x, y, self.display_surface)
                     enemy.set_lethal_hitbox(0, 0, 0, 0)
-                    self.enemies.add(enemy)
-                elif c == 's':
-                    enemy = TestEnemy(x, y, self.display_surface)
-                    enemy.set_lethal_hitbox(0, 0.5, 0, 0)
                     self.enemies.add(enemy)
 
     def setup_background(self):

@@ -21,7 +21,7 @@ level_1_1 = {
     'animated_z1':  './leveldata/1/1-1/1-1_animated_z1.csv',
     'static_z1':    './leveldata/1/1-1/1-1_static_z1.csv',
     'static_z2':    './leveldata/1/1-1/1-1_static_z2.csv',
-    'entities':    './leveldata/1/1-1/1-1_initial_pos.csv'
+    'entities':     './leveldata/1/1-1/1-1_initial_pos.csv'
 }
 
 level_data = [

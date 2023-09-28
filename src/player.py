@@ -135,7 +135,9 @@ class Player(pg.sprite.Sprite):
                 or self.animation_frame >= len(self.animations['jump']) - DEFAULT_ANIMATION_SPEED):
                 self.animation_state = 'airborne'
         elif self.velocity.x != 0:
-            if self.speed_mode == PLAYER_SPRINT_MULTIPLIER:
+            if not self.on_ground:
+                self.animation_state = 'airborne'
+            elif self.speed_mode == PLAYER_SPRINT_MULTIPLIER:
                 self.animation_state = 'sprint'
             elif self.speed_mode == PLAYER_SNEAK_MULTIPLIER:
                 self.animation_state = 'sneak'

@@ -34,13 +34,13 @@ class DynamicBackground(Background):
             self.rect.right -= 2*SCREEN_WIDTH
 
 class TiledDynamicBackground(pg.sprite.Group):
-    def __init__(self, pos: pg.Vector2, layout: List[List[str]], folder_path: str):
+    def __init__(self, topleft: pg.Vector2, layout: List[List[str]], folder_path: str):
         super().__init__()
         terrain_tiles = load.import_tilesheet(folder_path + 'map_tiles.png')
         for ri, r in enumerate(layout):
             for ci, c in enumerate(r):
                 if c == '-1': continue
-                pos = pg.Vector2(ci*TILE_SIZE, ri*TILE_SIZE)
+                pos = pg.Vector2(ci*TILE_SIZE, ri*TILE_SIZE) - topleft
                 tile_img = terrain_tiles[int(c)]
                 sprite = StaticBackgroundTile(pos, TILE_SIZE, tile_img)
                 self.add(sprite)

@@ -1,4 +1,5 @@
 import pygame as pg
+import numpy as np
 import random
 from typing import List
 import load
@@ -17,15 +18,14 @@ class LevelMenu:
         self.current_world = current_world-1
 
         self.view_shift = pg.Vector2(0, 0)
-        self.background = TiledDynamicBackground(
-            pg.Vector2(0,0),
-            load.import_csv_layout(world_data[self.current_world]['map']['terrain']),
-            world_data[self.current_world]['map']['assets_path']
-        )
+        mapdata = world_data[self.current_world]['map']
+        player_pos = pg.Vector2(SCREEN_WIDTH//2 - TILE_SIZE//2, SCREEN_HEIGHT//2 - TILE_SIZE//2)
+        background_offset = np.where(np.array(load.import_csv_layout(mapdata['player'])) == PLAYER_INITIALPOS_TILEID)
+        background_offset = pg.Vector2(background_offset[1][0]*TILE_SIZE, background_offset[0][0]*TILE_SIZE) - player_pos
+        self.background = TiledDynamicBackground(background_offset, load.import_csv_layout(mapdata['terrain']), mapdata['assets_path'])
 
         self.player = pg.sprite.GroupSingle()
-        pos = pg.Vector2(2*TILE_SIZE, 2*TILE_SIZE)
-        self.player.add(LevelMenuPlayer(pos, self.display_surface))
+        self.player.add(LevelMenuPlayer(player_pos, self.display_surface))
 
     def scroll_x(self):
         player = self.player.sprite

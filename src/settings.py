@@ -3,6 +3,7 @@ import pygame as pg
 # render
 VERTICAL_TILES = 14
 TILE_SIZE = 64
+PLAYER_INITIALPOS_TILEID = '0'
 
 # window
 SCREEN_WIDTH = 1600

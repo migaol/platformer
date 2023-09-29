@@ -28,9 +28,9 @@ world_data = [
     {
         'map': {
             'assets_path':  './assets/level/level_1/',
-            'player':   './leveldata/1/1-levelmap/1-levelmap_player.csv',
-            'terrain':  './leveldata/1/1-levelmap/1-levelmap_terrain.csv',
-            'path':     './leveldata/1/1-levelmap/1-levelmap_path.csv'
+            'player':       './leveldata/1/1-levelmap/1-levelmap_player.csv',
+            'terrain':      './leveldata/1/1-levelmap/1-levelmap_terrain.csv',
+            'path':         './leveldata/1/1-levelmap/1-levelmap_path.csv'
         },
         'levels': [
             level_1_1

@@ -24,10 +24,28 @@ class LevelMenu:
         background_offset = pg.Vector2(background_offset[1][0]*TILE_SIZE, background_offset[0][0]*TILE_SIZE) - player_pos
         self.background = TiledDynamicBackground(background_offset, load.import_csv_layout(mapdata['terrain']), mapdata['assets_path'])
 
-        self.path = TiledDynamicBackground(background_offset, load.import_csv_layout(mapdata['path']), mapdata['assets_path'])
+        path_array = load.import_csv_layout(mapdata['path'])
+        path_array = self.create_path_outline(path_array)
+        self.path = TiledDynamicPath(background_offset, path_array)
 
         self.player = pg.sprite.GroupSingle()
         self.player.add(LevelMenuPlayer(player_pos, self.display_surface))
+
+    def create_path_outline(self, path_array: List[List[str]]):
+        height, width = len(path_array), len(path_array[0])
+        new_path = np.full((width, height), NULL_TILEID)
+        for ri, r in enumerate(path_array):
+            for ci, c in enumerate(r):
+                if c != PATH_TILEID: continue
+                if ri > 0 and path_array[ri-1][ci] != PATH_TILEID:
+                    new_path[ri-1][ci] = PATH_TILEID
+                if ri < height and path_array[ri+1][ci] != PATH_TILEID:
+                    new_path[ri+1][ci] = PATH_TILEID
+                if ci > 0 and path_array[ri][ci-1] != PATH_TILEID:
+                    new_path[ri][ci-1] = PATH_TILEID
+                if ci < width and path_array[ri][ci+1] != PATH_TILEID:
+                    new_path[ri][ci+1] = PATH_TILEID
+        return new_path
 
     def scroll_x(self):
         player: LevelMenuPlayer = self.player.sprite
@@ -93,6 +111,7 @@ class LevelMenu:
         self.background.draw(self.display_surface)
 
         self.path.update(self.view_shift)
+        self.path.draw(self.display_surface)
 
         self.player.update()
         self.move_player()

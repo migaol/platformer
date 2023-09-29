@@ -45,6 +45,17 @@ class TiledDynamicBackground(pg.sprite.Group):
                 sprite = StaticBackgroundTile(pos, TILE_SIZE, tile_img)
                 self.add(sprite)
 
+class TiledDynamicPath(pg.sprite.Group):
+    def __init__(self, topleft: pg.Vector2, layout: List[List[str]]):
+        super().__init__()
+        for ri, r in enumerate(layout):
+            for ci, c in enumerate(r):
+                if c == '-1': continue
+                pos = pg.Vector2(ci*TILE_SIZE, ri*TILE_SIZE) - topleft
+                tile_img = pg.image.load('./assets/level/entities/01_path.png')
+                sprite = StaticBackgroundTile(pos, TILE_SIZE, tile_img)
+                self.add(sprite)
+
 class ParallaxBackground(pg.sprite.Group):
     def __init__(self, pos: pg.Vector2, height: int, parallax_factor: int, png_path: str):
         primary = DynamicBackground(pos, height, parallax_factor, png_path)

@@ -1,4 +1,7 @@
 import pygame as pg
+from typing import List
+import load
+from tile import *
 from settings import *
 
 class Background(pg.sprite.Sprite):
@@ -29,6 +32,18 @@ class DynamicBackground(Background):
             self.rect.left += 2*SCREEN_WIDTH
         elif self.rect.left >= SCREEN_WIDTH:
             self.rect.right -= 2*SCREEN_WIDTH
+
+class TiledDynamicBackground(pg.sprite.Group):
+    def __init__(self, pos: pg.Vector2, layout: List[List[str]], folder_path: str):
+        super().__init__()
+        terrain_tiles = load.import_tilesheet(folder_path + 'map_tiles.png')
+        for ri, r in enumerate(layout):
+            for ci, c in enumerate(r):
+                if c == '-1': continue
+                pos = pg.Vector2(ci*TILE_SIZE, ri*TILE_SIZE)
+                tile_img = terrain_tiles[int(c)]
+                sprite = StaticBackgroundTile(pos, TILE_SIZE, tile_img)
+                self.add(sprite)
 
 class ParallaxBackground(pg.sprite.Group):
     def __init__(self, pos: pg.Vector2, height: int, parallax_factor: int, png_path: str):

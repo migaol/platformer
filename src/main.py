@@ -7,7 +7,7 @@ from settings import *
 from leveldata import *
 import tracemalloc
 
-debug_mode = False
+debug_mode = True
 
 class Game:
     def __init__(self, surface: pg.Surface, debug_mode: bool = False):
@@ -17,7 +17,7 @@ class Game:
         self.unlocked_levels = [0]
         self.current_level = (1,1)
 
-        self.level_menu = LevelMenu(self.surface, self.debug_mode)
+        self.level_menu = LevelMenu(surface=self.surface, current_world=self.current_level[0], debug_mode=self.debug_mode)
         self.display_mode = 'level_menu'
         
         self.player_lives = PLAYER_LIVES
@@ -26,8 +26,7 @@ class Game:
         self.coins = 0
 
     def create_level(self):
-        level_id = level_data[self.current_level[0]-1]['levels'][self.current_level[1]-1]
-        self.level = Level(level_data=level_id, surface=screen, debug_mode=debug_mode)
+        self.level = Level(current_level=self.current_level, surface=screen, debug_mode=debug_mode)
         self.display_mode = 'level'
 
     def add_health(self, amount: int):

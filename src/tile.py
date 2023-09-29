@@ -10,7 +10,7 @@ class SquareTile(pg.sprite.Sprite):
         self.image = pg.Surface((size, size))
         self.rect = self.image.get_rect(topleft = pos)
 
-    def update(self, xshift):
+    def update(self, xshift: int):
         self.rect.x += xshift
 
 class BlankSquareTile(SquareTile):
@@ -30,7 +30,7 @@ class Tile(pg.sprite.Sprite):
         self.image = pg.Surface((width, height))
         self.rect = self.image.get_rect(topleft = pos)
 
-    def update(self, xshift):
+    def update(self, xshift: int):
         self.rect.x += xshift
 
 class StaticTile(Tile):
@@ -57,3 +57,12 @@ class AnimatedTile(Tile):
     def update(self, xshift: int, global_animation_frame: float):
         self.rect.x += xshift
         self.animate(global_animation_frame)
+
+class StaticBackgroundTile(SquareTile):
+    def __init__(self, pos: pg.Vector2, size: int, surface: pg.Surface):
+        super().__init__(pos, size)
+        self.image = surface
+
+    def update(self, shift: pg.Vector2):
+        self.rect.x += shift.x
+        self.rect.y += shift.y

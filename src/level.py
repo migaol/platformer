@@ -11,9 +11,10 @@ from tile import *
 from bg import *
 from enemy import *
 from settings import *
+from leveldata import world_data
 
 class Level:
-    def __init__(self, level_data, surface: pg.Surface, debug_mode: bool = False) -> None:
+    def __init__(self, current_level: List[int], surface: pg.Surface, debug_mode: bool = False) -> None:
         random.seed(1)
         self.display_surface = surface
         self.debug_mode = debug_mode
@@ -22,6 +23,10 @@ class Level:
         self.view_shift = 0
         self.player_movement = pg.Vector2(0, 0)
 
+        self.current_level = current_level
+        current_world = self.current_level[0]-1
+        current_stage = self.current_level[1]-1
+        level_data = world_data[current_world]['levels'][current_stage]
         self.setup_entities(load.import_csv_layout(level_data['entities']))
 
         self.gui = Gui(self.display_surface, 1, self.player.sprite)
@@ -97,10 +102,10 @@ class Level:
         player_x = player.rect.centerx
         direction_x = player.velocity.x
 
-        if player_x < SCREEN_SCROLL_THRESHOLD and direction_x < 0:
+        if player_x < SCREEN_SCROLL_THRESHOLD_HORIZONTAL and direction_x < 0:
             self.view_shift = -direction_x
             self.player_movement.x = -self.view_shift
-        elif player_x > SCREEN_WIDTH - SCREEN_SCROLL_THRESHOLD and direction_x > 0:
+        elif player_x > SCREEN_WIDTH - SCREEN_SCROLL_THRESHOLD_HORIZONTAL and direction_x > 0:
             self.view_shift = -direction_x
             self.player_movement.x = -self.view_shift
         else:

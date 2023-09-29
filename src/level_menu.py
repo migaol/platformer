@@ -7,23 +7,51 @@ from particles import ParticleEffect
 from tile import *
 from bg import *
 from settings import *
+from leveldata import world_data
 
 class LevelMenu:
-    def __init__(self, surface: pg.Surface, debug_mode: bool = False):
+    def __init__(self, surface: pg.Surface, current_world: int, debug_mode: bool = False):
         self.display_surface = surface
         self.debug_mode = debug_mode
 
-        self.background = pg.sprite.Group()
-        self.background.add(StaticBackground(0, SCREEN_HEIGHT, 'assets/test_levelmap.png'))
+        self.current_world = current_world-1
+
+        self.view_shift = pg.Vector2(0, 0)
+        self.background = TiledDynamicBackground(
+            pg.Vector2(0,0),
+            load.import_csv_layout(world_data[self.current_world]['map']['terrain']),
+            world_data[self.current_world]['map']['assets_path']
+        )
 
         self.player = pg.sprite.GroupSingle()
         pos = pg.Vector2(2*TILE_SIZE, 2*TILE_SIZE)
         self.player.add(LevelMenuPlayer(pos, self.display_surface))
 
+    def scroll_x(self):
+        player = self.player.sprite
+        position = pg.Vector2(player.rect.center)
+        direction = player.direction
+
+        if position.x < SCREEN_SCROLL_THRESHOLD_HORIZONTAL and direction.x < 0:
+            self.view_shift.x = -direction.x
+        elif position.x > SCREEN_WIDTH - SCREEN_SCROLL_THRESHOLD_HORIZONTAL and direction.x > 0:
+            self.view_shift.x = -direction.x
+        else:
+            self.view_shift.x = 0
+        if position.y < SCREEN_SCROLL_THRESHOLD_VERTICAL and direction.y < 0:
+            self.view_shift.y = -direction.y
+        elif position.y > SCREEN_HEIGHT - SCREEN_SCROLL_THRESHOLD_VERTICAL and direction.y > 0:
+            self.view_shift.y = -direction.y
+        else:
+            self.view_shift.y = 0
+        self.view_shift *= player.speed
+
     def run(self):
-        # self.background.update(self.player_movement)
+        self.scroll_x()
+        self.background.update(self.view_shift)
         self.background.draw(self.display_surface)
-        self.player.update()
+
+        self.player.update(self.view_shift)
         self.player.draw(self.display_surface)
 
 class LevelMenuPlayer(pg.sprite.Sprite):
@@ -91,12 +119,15 @@ class LevelMenuPlayer(pg.sprite.Sprite):
         else:
             self.animation_state = 'idle'
 
-    def move(self):
-        self.rect.topleft += self.direction * self.speed
+    def move(self, view_shift: pg.Vector2):
+        if view_shift.x == 0:
+            self.rect.x += self.direction.x * self.speed
+        if view_shift.y == 0:
+            self.rect.y += self.direction.y * self.speed
 
-    def update(self):
+    def update(self, view_shift: pg.Vector2):
         self.get_input()
         self.update_animation_state()
         self.animate_particles()
         self.animate()
-        self.move()
+        self.move(view_shift)

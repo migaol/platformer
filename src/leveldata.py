@@ -24,9 +24,14 @@ level_1_1 = {
     'entities':     './leveldata/1/1-1/1-1_initial_pos.csv'
 }
 
-level_data = [
+world_data = [
     {
-        'map': 'assets/test_levelmap.png',
+        'map': {
+            'assets_path':  './assets/level/level_1/',
+            'player':   './leveldata/1/1-levelmap/1-levelmap_player.csv',
+            'terrain':  './leveldata/1/1-levelmap/1-levelmap_terrain.csv',
+            'path':     './leveldata/1/1-levelmap/1-levelmap_path.csv'
+        },
         'levels': [
             level_1_1
         ]

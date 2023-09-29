@@ -98,7 +98,7 @@ class Level:
         self.background = pg.sprite.Group(*composite_layers)
 
     def scroll_x(self):
-        player = self.player.sprite
+        player: Player = self.player.sprite
         player_x = player.rect.centerx
         direction_x = player.velocity.x
 
@@ -112,7 +112,7 @@ class Level:
             self.view_shift = 0
 
     def player_horizontal_movement(self):
-        player = self.player.sprite
+        player: Player = self.player.sprite
         if self.view_shift == 0:
             player.rect.x += player.velocity.x
 
@@ -138,7 +138,7 @@ class Level:
     
     def player_vertical_movement(self):
         player_was_on_ground = self.player.sprite.on_ground
-        player = self.player.sprite
+        player: Player = self.player.sprite
 
         if player.velocity.y == player.jump_speed:
             self.create_player_jump_particles()
@@ -166,7 +166,7 @@ class Level:
             self.create_player_land_particles()
 
     def player_enemy_collision(self):
-        player = self.player.sprite
+        player: Player = self.player.sprite
         for enemy in self.enemies.sprites():
             if enemy.rect.colliderect(player.rect) and player.animation_state != 'hurt':
                 if enemy.collide_lethal_hitbox(player.rect):

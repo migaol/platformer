@@ -24,11 +24,13 @@ class LevelMenu:
         background_offset = pg.Vector2(background_offset[1][0]*TILE_SIZE, background_offset[0][0]*TILE_SIZE) - player_pos
         self.background = TiledDynamicBackground(background_offset, load.import_csv_layout(mapdata['terrain']), mapdata['assets_path'])
 
+        self.path = TiledDynamicBackground(background_offset, load.import_csv_layout(mapdata['path']), mapdata['assets_path'])
+
         self.player = pg.sprite.GroupSingle()
         self.player.add(LevelMenuPlayer(player_pos, self.display_surface))
 
     def scroll_x(self):
-        player = self.player.sprite
+        player: LevelMenuPlayer = self.player.sprite
         position = pg.Vector2(player.rect.center)
         direction = player.direction
 
@@ -45,14 +47,57 @@ class LevelMenu:
         else:
             self.view_shift.y = 0
         self.view_shift *= player.speed
+    
+    def move_player(self):
+        player: LevelMenuPlayer = self.player.sprite
+        if self.view_shift.x == 0:
+            player.rect.x += player.direction.x * player.speed
+        if self.view_shift.y == 0:
+            player.rect.y += player.direction.y * player.speed
+        collision_x = collision_y = None
+
+        for sprite in self.path.sprites():
+            if sprite.rect.colliderect(player.rect):
+                if player.direction.x < 0:
+                    player.rect.left = sprite.rect.right
+                    player.on_left = True
+                    player.direction.x = 0
+                    collision_x = player.rect.left
+                elif player.direction.x > 0:
+                    player.rect.right = sprite.rect.left
+                    player.on_right = True
+                    player.direction.x = 0
+                    collision_x = player.rect.right
+                if player.direction.y > 0:
+                    player.rect.bottom = sprite.rect.top
+                    player.on_ground = True
+                    player.direction.y = 0
+                    collision_y = player.rect.bottom
+                elif player.direction.y < 0:
+                    player.rect.top = sprite.rect.bottom
+                    player.on_ceiling = True
+                    player.direction.y = 0
+                    collision_y = player.rect.top
+        if player.on_left and collision_x and (player.rect.left < collision_x or player.direction.x >= 0):
+            player.on_left = False
+        if player.on_right and collision_x and (player.rect.right > collision_x or player.direction.x <= 0):
+            player.on_right = False
+        if player.on_ceiling and collision_y and (player.rect.top < collision_y or player.direction.y >= 0):
+            player.on_ceiling = False
+        if player.on_right and collision_y and (player.rect.right > collision_y or player.direction.y <= 0):
+            player.on_right = False
 
     def run(self):
         self.scroll_x()
         self.background.update(self.view_shift)
         self.background.draw(self.display_surface)
 
-        self.player.update(self.view_shift)
+        self.path.update(self.view_shift)
+
+        self.player.update()
+        self.move_player()
         self.player.draw(self.display_surface)
+        print(self.player.sprite.direction)
 
 class LevelMenuPlayer(pg.sprite.Sprite):
     def __init__(self, pos: pg.Vector2, surface: pg.Surface):
@@ -70,6 +115,10 @@ class LevelMenuPlayer(pg.sprite.Sprite):
         self.speed = PLAYER_MAX_MOMENTUM
 
         self.facing_right = True
+        self.on_ground = False
+        self.on_ceiling = False
+        self.on_left = False
+        self.on_right = False
 
     def load_player_assets(self):
         filepath = './assets/player/blue/'
@@ -103,31 +152,25 @@ class LevelMenuPlayer(pg.sprite.Sprite):
         self.image = image if self.facing_right else pg.transform.flip(image, True, False)
 
     def animate_particles(self):
-        animation_frame = int(self.animation_frame) % len(self.particles_walk)
-        particle = self.particles_walk[animation_frame]
-        particle_rect = particle.get_rect()
-        if self.facing_right:
-            self.display_surface.blit(particle,
-                                    self.rect.bottomleft - pg.Vector2(0, particle_rect.height))
-        else:
-            self.display_surface.blit(pg.transform.flip(particle, True, False),
-                                    self.rect.bottomright - pg.Vector2(particle_rect.width, particle_rect.height))
+        if self.animation_state == 'walk':
+            animation_frame = int(self.animation_frame) % len(self.particles_walk)
+            particle = self.particles_walk[animation_frame]
+            particle_rect = particle.get_rect()
+            if self.facing_right:
+                self.display_surface.blit(particle,
+                                        self.rect.bottomleft - pg.Vector2(0, particle_rect.height))
+            else:
+                self.display_surface.blit(pg.transform.flip(particle, True, False),
+                                        self.rect.bottomright - pg.Vector2(particle_rect.width, particle_rect.height))
     
     def update_animation_state(self):
-        if self.direction.x != 0 or self.direction.y != 0:
-            self.animation_state = 'walk'
-        else:
+        if self.direction.x == 0 and self.direction.y == 0:
             self.animation_state = 'idle'
+        else:
+            self.animation_state = 'walk'
 
-    def move(self, view_shift: pg.Vector2):
-        if view_shift.x == 0:
-            self.rect.x += self.direction.x * self.speed
-        if view_shift.y == 0:
-            self.rect.y += self.direction.y * self.speed
-
-    def update(self, view_shift: pg.Vector2):
+    def update(self):
         self.get_input()
         self.update_animation_state()
         self.animate_particles()
         self.animate()
-        self.move(view_shift)

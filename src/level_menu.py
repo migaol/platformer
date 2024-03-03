@@ -111,12 +111,11 @@ class LevelMenu:
         self.background.draw(self.display_surface)
 
         self.path.update(self.view_shift)
-        self.path.draw(self.display_surface)
+        if self.debug_mode: self.path.draw(self.display_surface)
 
         self.player.update()
         self.move_player()
         self.player.draw(self.display_surface)
-        print(self.player.sprite.direction)
 
 class LevelMenuPlayer(pg.sprite.Sprite):
     def __init__(self, pos: pg.Vector2, surface: pg.Surface):

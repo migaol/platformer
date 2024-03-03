@@ -220,7 +220,8 @@ class Level:
         self.global_animation_frame += DEFAULT_ANIMATION_SPEED
 
         self.scroll_x()
-        self.background.update(self.player_movement)
+        bg_movement = pg.Vector2(-self.view_shift, 0)
+        self.background.update(bg_movement)
         self.background.draw(self.display_surface)
 
         self.terrain_tiles.update(self.view_shift)

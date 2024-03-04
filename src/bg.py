@@ -46,13 +46,14 @@ class TiledDynamicBackground(pg.sprite.Group):
                 self.add(sprite)
 
 class TiledDynamicPath(pg.sprite.Group):
-    def __init__(self, topleft: pg.Vector2, layout: List[List[str]]):
+    def __init__(self, topleft: pg.Vector2, layout: List[List[str]], path_wall: bool = False):
         super().__init__()
+        if not path_wall: path_tiles = load.import_tilesheet('./assets/level/level_1/map_tiles.png')
         for ri, r in enumerate(layout):
             for ci, c in enumerate(r):
                 if c == '-1': continue
                 pos = pg.Vector2(ci*TILE_SIZE, ri*TILE_SIZE) - topleft
-                tile_img = pg.image.load('./assets/level/entities/01_path.png')
+                tile_img = pg.image.load('./assets/level/entities/01_path.png') if path_wall else path_tiles[int(c)]
                 sprite = StaticBackgroundTile(pos, TILE_SIZE, tile_img)
                 self.add(sprite)
 

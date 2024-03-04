@@ -25,7 +25,8 @@ class LevelMenu:
         self.background = TiledDynamicBackground(background_offset, load.import_csv_layout(mapdata['terrain']), mapdata['assets_path'])
 
         path_array = load.import_csv_layout(mapdata['path'])
-        path_array = self.create_path_outline(path_array)
+        path_wall_array = self.create_path_outline(path_array)
+        self.path_wall = TiledDynamicPath(background_offset, path_wall_array, path_wall=True)
         self.path = TiledDynamicPath(background_offset, path_array)
 
         self.player = pg.sprite.GroupSingle()
@@ -36,18 +37,18 @@ class LevelMenu:
         new_path = np.full((width, height), NULL_TILEID)
         for ri, r in enumerate(path_array):
             for ci, c in enumerate(r):
-                if c != PATH_TILEID: continue
-                if ri > 0 and path_array[ri-1][ci] != PATH_TILEID:
+                if c == NULL_TILEID: continue
+                if ri > 0 and path_array[ri-1][ci] == NULL_TILEID:
                     new_path[ri-1][ci] = PATH_TILEID
-                if ri < height and path_array[ri+1][ci] != PATH_TILEID:
+                if ri < height and path_array[ri+1][ci] == NULL_TILEID:
                     new_path[ri+1][ci] = PATH_TILEID
-                if ci > 0 and path_array[ri][ci-1] != PATH_TILEID:
+                if ci > 0 and path_array[ri][ci-1] == NULL_TILEID:
                     new_path[ri][ci-1] = PATH_TILEID
-                if ci < width and path_array[ri][ci+1] != PATH_TILEID:
+                if ci < width and path_array[ri][ci+1] == NULL_TILEID:
                     new_path[ri][ci+1] = PATH_TILEID
         return new_path
 
-    def scroll_x(self):
+    def scroll(self):
         player: LevelMenuPlayer = self.player.sprite
         position = pg.Vector2(player.rect.center)
         direction = player.direction
@@ -74,7 +75,7 @@ class LevelMenu:
             player.rect.y += player.direction.y * player.speed
         collision_x = collision_y = None
 
-        for sprite in self.path.sprites():
+        for sprite in self.path_wall.sprites():
             if sprite.rect.colliderect(player.rect):
                 if player.direction.x < 0:
                     player.rect.left = sprite.rect.right
@@ -106,12 +107,14 @@ class LevelMenu:
             player.on_right = False
 
     def run(self):
-        self.scroll_x()
+        self.scroll()
         self.background.update(self.view_shift)
         self.background.draw(self.display_surface)
 
         self.path.update(self.view_shift)
-        if self.debug_mode: self.path.draw(self.display_surface)
+        self.path.draw(self.display_surface)
+        self.path_wall.update(self.view_shift)
+        if self.debug_mode: self.path_wall.draw(self.display_surface)
 
         self.player.update()
         self.move_player()

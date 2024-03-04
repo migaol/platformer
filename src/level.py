@@ -69,20 +69,20 @@ class Level:
                 sprite_group.add(sprite)
         return sprite_group
 
-    def setup_entities(self, layout: List[List[str]]):
+    def setup_entities(self, layout: List[List[str]]) -> None:
         self.player = pg.sprite.GroupSingle()
         self.enemies = pg.sprite.Group()
         for ri,r in enumerate(layout):
             for ci,c in enumerate(r):
                 x, y = ci*TILE_SIZE, ri*TILE_SIZE
                 if c == '0':
-                    self.player.add(Player((x,y), self.display_surface))
+                    self.player.add(Player(pg.Vector2(x,y), self.display_surface))
                 elif c == 'z':
                     enemy = TestEnemy(x, y, self.display_surface)
                     enemy.set_lethal_hitbox(0, 0, 0, 0)
                     self.enemies.add(enemy)
 
-    def setup_background(self):
+    def setup_background(self) -> None:
         bg_files = load.import_background_files('./assets/level/level_1/background')
         composite_layers = []
         for layer_type in bg_files:
@@ -97,7 +97,7 @@ class Level:
         
         self.background = pg.sprite.Group(*composite_layers)
 
-    def scroll_x(self):
+    def scroll_x(self) -> None:
         player: Player = self.player.sprite
         player_x = player.rect.centerx
         direction_x = player.velocity.x
@@ -111,7 +111,7 @@ class Level:
         else:
             self.view_shift = 0
 
-    def player_horizontal_movement(self):
+    def player_horizontal_movement(self) -> None:
         player: Player = self.player.sprite
         if self.view_shift == 0:
             player.rect.x += player.velocity.x
@@ -136,7 +136,7 @@ class Level:
         else:
             self.player_movement.x = 0
     
-    def player_vertical_movement(self):
+    def player_vertical_movement(self) -> None:
         player_was_on_ground = self.player.sprite.on_ground
         player: Player = self.player.sprite
 
@@ -165,7 +165,7 @@ class Level:
                 player.land()
             self.create_player_land_particles()
 
-    def player_enemy_collision(self):
+    def player_enemy_collision(self) -> None:
         player: Player = self.player.sprite
         for enemy in self.enemies.sprites():
             if enemy.rect.colliderect(player.rect) and player.animation_state != 'hurt':
@@ -178,7 +178,7 @@ class Level:
                     player.jumps += 1
                     enemy.kill()
 
-    def enemy_horizontal_movement(self):
+    def enemy_horizontal_movement(self) -> None:
         for enemy in self.enemies.sprites():
             enemy.move()
             for sprite in self.terrain_tiles.sprites():
@@ -189,7 +189,7 @@ class Level:
                         enemy.rect.right = sprite.rect.left
                     enemy.reverse()
 
-    def enemy_vertical_movement(self):
+    def enemy_vertical_movement(self) -> None:
         for enemy in self.enemies.sprites():
             enemy.apply_gravity()
             for sprite in self.terrain_tiles.sprites():
@@ -199,24 +199,24 @@ class Level:
                         enemy.velocity.y = 0
                         enemy.on_ground = True
 
-    def create_player_jump_particles(self):
+    def create_player_jump_particles(self) -> None:
         x, y = self.player.sprite.rect.midbottom
         jump_particle = ParticleEffect(x, y, 'player_jumping')
         self.particle_sprites.add(jump_particle)
 
-    def create_player_land_particles(self):
+    def create_player_land_particles(self) -> None:
         x, y = self.player.sprite.rect.midbottom
         landing_particle = ParticleEffect(x, y, 'player_landing')
         self.particle_sprites.add(landing_particle)
 
-    def draw_debug_hitbox(self, hitbox: pg.Rect, type: str, stroke: int = 4):
+    def debug_draw_hitbox(self, hitbox: pg.Rect, type: str, stroke: int = 4) -> None:
         if type == 'hitbox':
             color = HITBOX_COLOR
         elif type == 'lethal':
             color = LETHAL_HITBOX_COLOR
         pg.draw.rect(self.display_surface, color, hitbox, stroke)
 
-    def run(self):
+    def run(self) -> None:
         self.global_animation_frame += DEFAULT_ANIMATION_SPEED
 
         self.scroll_x()
@@ -229,9 +229,9 @@ class Level:
 
         self.animated_z1.update(self.view_shift, self.global_animation_frame)
         self.animated_z1.draw(self.display_surface)
-        self.static_z1.update(self.view_shift, self.global_animation_frame)
+        self.static_z1.update(self.view_shift)
         self.static_z1.draw(self.display_surface)
-        self.static_z2.update(self.view_shift, self.global_animation_frame)
+        self.static_z2.update(self.view_shift)
         self.static_z2.draw(self.display_surface)
 
         self.enemies.update(self.view_shift)
@@ -251,7 +251,7 @@ class Level:
         self.gui.draw()
 
         if self.debug_mode:
-            self.draw_debug_hitbox(self.player.sprite.rect, 'hitbox')
+            self.debug_draw_hitbox(self.player.sprite.rect, 'hitbox')
             for enemy in self.enemies.sprites():
-                self.draw_debug_hitbox(enemy.rect, 'hitbox')
-                self.draw_debug_hitbox(enemy.get_lethal_hitbox(), 'lethal')
+                self.debug_draw_hitbox(enemy.rect, 'hitbox')
+                self.debug_draw_hitbox(enemy.get_lethal_hitbox(), 'lethal')

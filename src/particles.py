@@ -3,7 +3,7 @@ from settings import *
 import load
 
 class ParticleEffect(pg.sprite.Sprite):
-    def __init__(self, x: int, y: int, type: str):
+    def __init__(self, x: int, y: int, type: str) -> None:
         super().__init__()
         self.frame_index = 0
         self.animation_speed = DEFAULT_ANIMATION_SPEED
@@ -17,13 +17,13 @@ class ParticleEffect(pg.sprite.Sprite):
         self.image = self.frames[self.frame_index]
         self.rect = self.image.get_rect(midbottom = (x, y) + offset)
 
-    def animate(self):
+    def animate(self) -> None:
         self.frame_index += self.animation_speed
         if self.frame_index >= len(self.frames):
             self.kill()
         else:
             self.image = self.frames[int(self.frame_index)]
 
-    def update(self, xshift):
+    def update(self, xshift) -> None:
         self.animate()
         self.rect.x += xshift

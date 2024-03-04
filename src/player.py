@@ -3,7 +3,7 @@ from settings import *
 import load
 
 class Player(pg.sprite.Sprite):
-    def __init__(self, pos: pg.Vector2, surface: pg.Surface):
+    def __init__(self, pos: pg.Vector2, surface: pg.Surface) -> None:
         super().__init__()
         self.display_surface = surface
 
@@ -33,16 +33,16 @@ class Player(pg.sprite.Sprite):
         self.on_left = False
         self.on_right = False
 
-    def load_player_assets(self):
+    def load_player_assets(self) -> None:
         filepath = './assets/player/blue/'
         self.animations = {'idle': [], 'sneak': [], 'walk': [], 'sprint': [], 'airborne': [], 'jump': [], 'land': [], 'hurt': []}
         for animation in self.animations.keys():
             self.animations[animation] = load.import_tilesheet(filepath + 'blue_' + animation + '.png')
     
-    def load_particle_assets(self):
+    def load_particle_assets(self) -> None:
         self.particles_walk = load.import_tilesheet('./assets/player/walk_dust.png')
 
-    def get_input(self):
+    def get_input(self) -> None:
         pressed = pg.key.get_pressed()
         if pressed[KEY_SPRINT]:
             self.speed_mode = PLAYER_SPRINT_MULTIPLIER
@@ -68,16 +68,16 @@ class Player(pg.sprite.Sprite):
         if pressed[KEY_JUMP] and self.can_jump():
             self.jump()
 
-    def apply_gravity(self):
+    def apply_gravity(self) -> None:
         self.velocity.y += min(self.gravity, self.terminal_velocity)
         self.rect.y += self.velocity.y
         if self.jump_cooldown > -1:
             self.jump_cooldown -= 1
 
-    def can_jump(self):
+    def can_jump(self) -> None:
         return (self.on_ground or self.jumps > 0) and self.jump_cooldown <= 0
 
-    def jump(self):
+    def jump(self) -> None:
         self.velocity.y = self.jump_speed
         self.jumps -= 1
         self.jump_cooldown = PLAYER_JUMP_COOLDOWN
@@ -85,7 +85,7 @@ class Player(pg.sprite.Sprite):
         if self.animation_state != 'hurt':
             self.animation_state = 'jump'
 
-    def animate(self):
+    def animate(self) -> None:
         self.animation_frame += DEFAULT_ANIMATION_SPEED
         animation = self.animations[self.animation_state]
         if self.animation_state == 'sneak':
@@ -111,7 +111,7 @@ class Player(pg.sprite.Sprite):
         #     else:
         #         self.rect = self.image.get_rect(midtop = self.rect.midtop)
 
-    def animate_particles(self):
+    def animate_particles(self) -> None:
         if self.animation_state == 'sprint' and self.on_ground:
             animation_frame = int(self.animation_frame) % len(self.particles_walk)
             particle = self.particles_walk[animation_frame]
@@ -123,11 +123,11 @@ class Player(pg.sprite.Sprite):
                 self.display_surface.blit(pg.transform.flip(particle, True, False),
                                         self.rect.bottomright - pg.Vector2(particle_rect.width, particle_rect.height))
     
-    def land(self):
+    def land(self) -> None:
         self.animation_frame = 0
         self.animation_state = 'land'
 
-    def update_animation_state(self):
+    def update_animation_state(self) -> None:
         if self.animation_state == 'hurt' and self.animation_frame < len(self.animations['hurt']):
             return
         if self.velocity.y != 0:
@@ -147,12 +147,12 @@ class Player(pg.sprite.Sprite):
             if self.animation_frame >= len(self.animations['land']):
                 self.animation_state = 'idle'
 
-    def damage(self):
+    def damage(self) -> None:
         self.current_hp -= 1
         self.animation_frame = 0
         self.animation_state = 'hurt'
 
-    def update(self):
+    def update(self) -> None:
         self.get_input()
         self.update_animation_state()
         self.animate_particles()

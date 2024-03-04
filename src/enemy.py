@@ -3,12 +3,12 @@ from settings import *
 import load
 
 class LethalHitbox:
-    def __init__(self, pos: pg.Vector2, w: int, h: int):
+    def __init__(self, pos: pg.Vector2, w: int, h: int) -> None:
         self.x, self.y = pos
         self.w, self.h = w, h
 
 class Enemy(pg.sprite.Sprite):
-    def __init__(self, pos: pg.Vector2, surface: pg.Surface):
+    def __init__(self, pos: pg.Vector2, surface: pg.Surface) -> None:
         super().__init__()
         self.image = pg.image.load('./assets/test_direction.png').convert_alpha()
         self.rect = self.image.get_rect(topleft = (pos))
@@ -20,7 +20,7 @@ class Enemy(pg.sprite.Sprite):
         self.gravity = PLAYER_GRAVITY
         self.terminal_velocity = PLAYER_TERMINAL_VELOCITY
 
-    def set_lethal_hitbox(self, left: float, top: float, right: float, bottom: float):
+    def set_lethal_hitbox(self, left: float, top: float, right: float, bottom: float) -> None:
         self.lethal_hitbox.x = left * self.rect.w
         self.lethal_hitbox.y = top * self.rect.h
         self.lethal_hitbox.w = self.rect.w - (left+right) * self.rect.w
@@ -36,22 +36,22 @@ class Enemy(pg.sprite.Sprite):
             self.rect.x + self.lethal_hitbox.x, self.rect.y + self.lethal_hitbox.y,
             self.lethal_hitbox.w, self.lethal_hitbox.h)
 
-    def apply_gravity(self):
+    def apply_gravity(self) -> None:
         self.velocity.y += min(self.gravity, self.terminal_velocity)
         self.rect.y += self.velocity.y
 
-    def move(self):
+    def move(self) -> None:
         self.rect.x += self.velocity.x
 
-    def reverse(self):
+    def reverse(self) -> None:
         self.velocity.x *= -1
         self.image = pg.transform.flip(self.image, True, False)
 
-    def update(self, view_shift: int):
+    def update(self, view_shift: int) -> None:
         self.rect.x += view_shift
 
 class TestEnemy(Enemy):
-    def __init__(self, pos: pg.Vector2, surface: pg.Surface):
+    def __init__(self, pos: pg.Vector2, surface: pg.Surface) -> None:
         super().__init__(pos, surface)
         self.image = pg.image.load('./assets/test_direction.png').convert_alpha()
         self.rect = self.image.get_rect(topleft = (pos))

@@ -11,7 +11,7 @@ from settings import *
 from leveldata import world_data
 
 class LevelMenu:
-    def __init__(self, surface: pg.Surface, current_world: int, debug_mode: bool = False):
+    def __init__(self, surface: pg.Surface, current_world: int, debug_mode: bool = False) -> None:
         self.display_surface = surface
         self.debug_mode = debug_mode
 
@@ -52,7 +52,7 @@ class LevelMenu:
                     new_path[ri][ci+1] = PATH_TILEID
         return new_path
 
-    def scroll(self):
+    def scroll(self) -> None:
         player: LevelMenuPlayer = self.player.sprite
         position = pg.Vector2(player.rect.center)
         direction = player.direction
@@ -71,7 +71,7 @@ class LevelMenu:
             self.view_shift.y = 0
         self.view_shift *= player.speed
     
-    def move_player(self):
+    def move_player(self) -> None:
         player: LevelMenuPlayer = self.player.sprite
         if self.view_shift.x == 0:
             player.rect.x += player.direction.x * player.speed
@@ -110,7 +110,7 @@ class LevelMenu:
         if player.on_right and collision_y and (player.rect.right > collision_y or player.direction.y <= 0):
             player.on_right = False
 
-    def run(self):
+    def run(self) -> None:
         self.scroll()
         self.background.update(self.view_shift)
         self.background.draw(self.display_surface)
@@ -128,7 +128,7 @@ class LevelMenu:
         self.player.draw(self.display_surface)
 
 class LevelMenuPlayer(pg.sprite.Sprite):
-    def __init__(self, pos: pg.Vector2, surface: pg.Surface):
+    def __init__(self, pos: pg.Vector2, surface: pg.Surface) -> None:
         super().__init__()
         self.display_surface = surface
 
@@ -148,16 +148,16 @@ class LevelMenuPlayer(pg.sprite.Sprite):
         self.on_left = False
         self.on_right = False
 
-    def load_player_assets(self):
+    def load_player_assets(self) -> None:
         filepath = './assets/player/blue/'
         self.animations = {'idle': [], 'walk': []}
         for animation in self.animations.keys():
             self.animations[animation] = load.import_tilesheet(filepath + 'blue_' + animation + '.png')
     
-    def load_particle_assets(self):
+    def load_particle_assets(self) -> None:
         self.particles_walk = load.import_tilesheet('./assets/player/walk_dust.png')
 
-    def get_input(self):
+    def get_input(self) -> None:
         pressed = pg.key.get_pressed()
         
         if pressed[KEY_RIGHT]:
@@ -171,7 +171,7 @@ class LevelMenuPlayer(pg.sprite.Sprite):
         elif pressed[KEY_DOWN]:
             self.direction.x, self.direction.y = 0, 1
 
-    def animate(self):
+    def animate(self) -> None:
         self.animation_frame += DEFAULT_ANIMATION_SPEED
         animation = self.animations[self.animation_state]
         animation_frame = int(self.animation_frame) % len(animation)
@@ -179,7 +179,7 @@ class LevelMenuPlayer(pg.sprite.Sprite):
         image = animation[int(animation_frame)]
         self.image = image if self.facing_right else pg.transform.flip(image, True, False)
 
-    def animate_particles(self):
+    def animate_particles(self) -> None:
         if self.animation_state == 'walk':
             animation_frame = int(self.animation_frame) % len(self.particles_walk)
             particle = self.particles_walk[animation_frame]
@@ -191,13 +191,13 @@ class LevelMenuPlayer(pg.sprite.Sprite):
                 self.display_surface.blit(pg.transform.flip(particle, True, False),
                                         self.rect.bottomright - pg.Vector2(particle_rect.width, particle_rect.height))
     
-    def update_animation_state(self):
+    def update_animation_state(self) -> None:
         if self.direction.x == 0 and self.direction.y == 0:
             self.animation_state = 'idle'
         else:
             self.animation_state = 'walk'
 
-    def update(self):
+    def update(self) -> None:
         self.get_input()
         self.update_animation_state()
         self.animate_particles()

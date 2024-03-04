@@ -7,10 +7,10 @@ from settings import *
 from leveldata import *
 import tracemalloc
 
-debug_mode = False
+debug_mode = True
 
 class Game:
-    def __init__(self, surface: pg.Surface, debug_mode: bool = False):
+    def __init__(self, surface: pg.Surface, debug_mode: bool = False) -> None:
         self.surface = surface
         self.debug_mode = debug_mode
 
@@ -25,30 +25,30 @@ class Game:
         self.player_current_health = PLAYER_MAX_HEALTH
         self.coins = 0
 
-    def create_level(self):
+    def create_level(self) -> None:
         self.level = Level(current_level=self.current_level, surface=screen, debug_mode=debug_mode)
         self.display_mode = 'level'
 
-    def add_health(self, amount: int):
+    def add_health(self, amount: int) -> None:
         self.player_current_health += amount
 
-    def get_input(self):
+    def get_input(self) -> None:
         pressed = pg.key.get_pressed()
         if pressed[KEY_SELECT]:
             self.create_level()
 
-    def click(self, pos: Tuple):
+    def click(self, pos: Tuple) -> None:
         if self.display_mode == 'level_menu':
             self.create_level()
 
-    def check_game_over(self):
+    def check_game_over(self) -> None:
         if self.player_current_health <= 0:
             self.player_current_health = PLAYER_MAX_HEALTH
             self.coins = 0
             self.level_menu = LevelMenu()
             self.display_mode = 'level_menu'
 
-    def run(self):
+    def run(self) -> None:
         if self.display_mode == 'level_menu':
             self.level_menu.run()
             self.get_input()

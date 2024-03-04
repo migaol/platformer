@@ -1,6 +1,6 @@
 import pygame as pg
 import os, csv, re
-from typing import List
+from typing import List, Tuple
 from settings import *
 
 def import_folder(folder_path: str) -> List[pg.Surface]:
@@ -33,7 +33,7 @@ def import_csv_layout(folder_path: str) -> List[List[str]]:
             terrain_map.append(list(row))
     return terrain_map
 
-def get_spritesheet(folder_path: str, id: int) -> (str, int, int):
+def get_spritesheet(folder_path: str, id: int) -> Tuple[str, int, int]:
     for _, _, filenames in os.walk(folder_path):
         for file in sorted(filenames):
             if re.match(r"^frames.*\.png$", file):

@@ -5,7 +5,7 @@ from player import Player
 import load
 
 class Gui:
-    def __init__(self, surface: pg.Surface, level: int, player: Player):
+    def __init__(self, surface: pg.Surface, level: int, player: Player) -> None:
         self.display_surface = surface
         self.level = level
 
@@ -18,14 +18,14 @@ class Gui:
             player=player
         )
 
-    def draw(self):
+    def draw(self) -> None:
         self.display_surface.blit(self.left_bar, (0, 0))
         # self.display_surface.blit(self.right_bar, (SCREEN_WIDTH-self.right_bar.get_width(), 0))
         
         self.hp_bar.draw()
 
 class HealthBar:
-    def __init__(self, pos: pg.Vector2, display_surface: pg.Surface, player: Player):
+    def __init__(self, pos: pg.Vector2, display_surface: pg.Surface, player: Player) -> None:
         self.display_surface = display_surface
         self.player = player
         
@@ -36,11 +36,11 @@ class HealthBar:
         self.transition_frames = len(player.animations['hurt']) // 2
         self.max_hp = self.player.max_hp
 
-    def lose_hp(self, amount: int):
+    def lose_hp(self, amount: int) -> None:
         self.fill.change_val(self.player.current_hp, amount)
         self.lost.reduce_val(self.player.current_hp, amount, self.max_hp)
     
-    def draw(self):
+    def draw(self) -> None:
         self.base.draw()
         if self.player.animation_state == 'hurt':
             self.lost.animate_change(self.player.animation_frame)
@@ -50,28 +50,28 @@ class HealthBar:
 
 class AttributeBar:
     class BarBase:
-        def __init__(self, pos: pg.Vector2, offset: pg.Vector2, png_path: str, display_surface: pg.Surface):
+        def __init__(self, pos: pg.Vector2, offset: pg.Vector2, png_path: str, display_surface: pg.Surface) -> None:
             self.image = pg.image.load(png_path).convert_alpha()
             self.display_surface = display_surface
             self.pos = pos
             self.offset = offset
 
-        def draw(self):
+        def draw(self) -> None:
             self.display_surface.blit(self.image, self.pos + self.offset)
 
     class BarFill(BarBase):
-        def __init__(self, pos: pg.Vector2, offset: pg.Vector2, png_path: str, display_surface: pg.Surface):
+        def __init__(self, pos: pg.Vector2, offset: pg.Vector2, png_path: str, display_surface: pg.Surface) -> None:
             super().__init__(pos, offset, png_path, display_surface)
             self.full_width = self.image.get_width()
             self.height = self.image.get_height()
             self.val_change_target = 0
             self.val_change_amount = 0
 
-        def change_val(self, new_val: int, amount: int):
+        def change_val(self, new_val: int, amount: int) -> None:
             self.val_change_target = new_val
             self.val_change_amount = amount
         
-        def animate_change(self, animation_frame: float, transition_frames: int, max_val: int):
+        def animate_change(self, animation_frame: float, transition_frames: int, max_val: int) -> None:
             if animation_frame <= transition_frames:
                 new_width = (
                     (self.val_change_target/max_val) * self.full_width +
@@ -82,16 +82,16 @@ class AttributeBar:
             self.draw()
 
     class BarLost(BarBase):
-        def __init__(self, pos: pg.Vector2, offset: pg.Vector2, png_path: str, display_surface: pg.Surface):
+        def __init__(self, pos: pg.Vector2, offset: pg.Vector2, png_path: str, display_surface: pg.Surface) -> None:
             super().__init__(pos, offset, png_path, display_surface)
             self.full_width = self.image.get_width()
             self.height = self.image.get_height()
             self.default_pos = pos.copy()
 
-        def reduce_val(self, new_val: int, amount: int, max_val: int):
+        def reduce_val(self, new_val: int, amount: int, max_val: int) -> None:
             self.pos.x = self.default_pos.x + (new_val/max_val) * self.full_width
             self.image = pg.transform.scale(self.image, ((amount/max_val) * self.full_width, self.height))
         
-        def animate_change(self, animation_frame: float):
+        def animate_change(self, animation_frame: float) -> None:
             if int(animation_frame) % 2 == 0:
                 self.draw()

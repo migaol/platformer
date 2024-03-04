@@ -160,6 +160,7 @@ class Level:
         
         if player.on_ground and player.velocity.y < 0 or player.velocity.y > player.gravity:
             player.on_ground = False
+            player.jumps = min(PLAYER_MAX_JUMPS-1, player.jumps) # disable ground jump when airborne
         if not player_was_on_ground and self.player.sprite.on_ground:
             if player.animation_state != 'hurt':
                 player.land()

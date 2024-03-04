@@ -36,7 +36,7 @@ class Enemy(pg.sprite.Sprite):
             self.rect.x + self.lethal_hitbox.x, self.rect.y + self.lethal_hitbox.y,
             self.lethal_hitbox.w, self.lethal_hitbox.h)
 
-    def apply_gravity(self) -> None:
+    def update_gravity(self) -> None:
         self.velocity.y += min(self.gravity, self.terminal_velocity)
         self.rect.y += self.velocity.y
 

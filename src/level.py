@@ -2,7 +2,7 @@ import pygame as pg
 import numpy as np
 from PIL import Image
 import random
-from typing import List
+from typing import List, Dict, Any
 import load
 from gui import Gui
 from player import Player
@@ -19,31 +19,35 @@ class Level:
         self.display_surface = surface
         self.debug_mode = debug_mode
 
-        self.setup_background()
+        self._setup_background()
         self.view_shift = 0
         self.player_movement = pg.Vector2(0, 0)
+        self.global_animation_frame = 0
 
         self.current_level = current_level
         current_world = self.current_level[0]-1
         current_stage = self.current_level[1]-1
         level_data = world_data[current_world]['levels'][current_stage]
-        self.setup_entities(load.import_csv_layout(level_data['entities']))
+
+        self._setup_entities(load.import_csv_layout(level_data['entities']))
 
         self.gui = Gui(self.display_surface, 1, self.player.sprite)
 
-        self.global_animation_frame = 0
+        self._setup_sprites(level_data)
+        
+    def _setup_sprites(self, level_data: Dict[str, Any]) -> None:
         self.particle_sprites = pg.sprite.Group()
 
-        self.terrain_tiles = self.create_tile_group(
+        self.terrain_tiles = self._create_tile_group(
             load.import_csv_layout(level_data['terrain']), level_data['assets_path'], 'terrain')
-        self.animated_z1 = self.create_tile_group(
+        self.animated_z1 = self._create_tile_group(
             load.import_csv_layout(level_data['animated_z1']), level_data['assets_path'], 'animated_z1')
-        self.static_z1 = self.create_tile_group(
+        self.static_z1 = self._create_tile_group(
             load.import_csv_layout(level_data['static_z1']), level_data['assets_path'],'static_z1')
-        self.static_z2 = self.create_tile_group(
+        self.static_z2 = self._create_tile_group(
             load.import_csv_layout(level_data['static_z2']), level_data['assets_path'],'static_z2')
 
-    def create_tile_group(self, layout: List[List[str]], folder_path: str, type: str) -> pg.sprite.Group:
+    def _create_tile_group(self, layout: List[List[str]], folder_path: str, type: str) -> pg.sprite.Group:
         sprite_group = pg.sprite.Group()
         terrain_tiles = load.import_tilesheet(folder_path + 'terrain.png')
         static_tiles, img_filenames = load.import_folder(folder_path + 'static')
@@ -69,7 +73,7 @@ class Level:
                 sprite_group.add(sprite)
         return sprite_group
 
-    def setup_entities(self, layout: List[List[str]]) -> None:
+    def _setup_entities(self, layout: List[List[str]]) -> None:
         self.player = pg.sprite.GroupSingle()
         self.enemies = pg.sprite.Group()
         for ri,r in enumerate(layout):
@@ -82,7 +86,7 @@ class Level:
                     enemy.set_lethal_hitbox(0, 0, 0, 0)
                     self.enemies.add(enemy)
 
-    def setup_background(self) -> None:
+    def _setup_background(self) -> None:
         bg_files = load.import_background_files('./assets/level/level_1/background')
         composite_layers = []
         for layer_type in bg_files:
@@ -97,7 +101,7 @@ class Level:
         
         self.background = pg.sprite.Group(*composite_layers)
 
-    def scroll_x(self) -> None:
+    def _animate_scroll_x(self) -> None:
         player: Player = self.player.sprite
         player_x = player.rect.centerx
         direction_x = player.velocity.x
@@ -111,7 +115,7 @@ class Level:
         else:
             self.view_shift = 0
 
-    def player_horizontal_movement(self) -> None:
+    def _update_player_horizontal_movement(self) -> None:
         player: Player = self.player.sprite
         if self.view_shift == 0:
             player.rect.x += player.velocity.x
@@ -136,14 +140,14 @@ class Level:
         else:
             self.player_movement.x = 0
     
-    def player_vertical_movement(self) -> None:
+    def _update_player_vertical_movement(self) -> None:
         player_was_on_ground = self.player.sprite.on_ground
         player: Player = self.player.sprite
 
         if player.velocity.y == player.jump_speed:
-            self.create_player_jump_particles()
+            self._create_player_jump_particles()
         
-        player.apply_gravity()
+        player.update_gravity()
 
         for sprite in self.terrain_tiles.sprites():
             if sprite.rect.colliderect(player.rect):
@@ -164,9 +168,9 @@ class Level:
         if not player_was_on_ground and self.player.sprite.on_ground:
             if player.animation_state != 'hurt':
                 player.land()
-            self.create_player_land_particles()
+            self._create_player_land_particles()
 
-    def player_enemy_collision(self) -> None:
+    def _update_player_enemy_collision(self) -> None:
         player: Player = self.player.sprite
         for enemy in self.enemies.sprites():
             if enemy.rect.colliderect(player.rect) and player.animation_state != 'hurt':
@@ -179,7 +183,7 @@ class Level:
                     player.jumps += 1
                     enemy.kill()
 
-    def enemy_horizontal_movement(self) -> None:
+    def _update_enemy_horizontal_movement(self) -> None:
         for enemy in self.enemies.sprites():
             enemy.move()
             for sprite in self.terrain_tiles.sprites():
@@ -190,7 +194,7 @@ class Level:
                         enemy.rect.right = sprite.rect.left
                     enemy.reverse()
 
-    def enemy_vertical_movement(self) -> None:
+    def _update_enemy_vertical_movement(self) -> None:
         for enemy in self.enemies.sprites():
             enemy.apply_gravity()
             for sprite in self.terrain_tiles.sprites():
@@ -200,12 +204,12 @@ class Level:
                         enemy.velocity.y = 0
                         enemy.on_ground = True
 
-    def create_player_jump_particles(self) -> None:
+    def _create_player_jump_particles(self) -> None:
         x, y = self.player.sprite.rect.midbottom
         jump_particle = ParticleEffect(x, y, 'player_jumping')
         self.particle_sprites.add(jump_particle)
 
-    def create_player_land_particles(self) -> None:
+    def _create_player_land_particles(self) -> None:
         x, y = self.player.sprite.rect.midbottom
         landing_particle = ParticleEffect(x, y, 'player_landing')
         self.particle_sprites.add(landing_particle)
@@ -220,7 +224,7 @@ class Level:
     def run(self) -> None:
         self.global_animation_frame += DEFAULT_ANIMATION_SPEED
 
-        self.scroll_x()
+        self._animate_scroll_x()
         bg_movement = pg.Vector2(-self.view_shift, 0)
         self.background.update(bg_movement)
         self.background.draw(self.display_surface)
@@ -236,14 +240,14 @@ class Level:
         self.static_z2.draw(self.display_surface)
 
         self.enemies.update(self.view_shift)
-        self.enemy_horizontal_movement()
-        self.enemy_vertical_movement()
+        self._update_enemy_horizontal_movement()
+        self._update_enemy_vertical_movement()
         self.enemies.draw(self.display_surface)
 
         self.player.update()
-        self.player_horizontal_movement()
-        self.player_vertical_movement()
-        self.player_enemy_collision()
+        self._update_player_horizontal_movement()
+        self._update_player_vertical_movement()
+        self._update_player_enemy_collision()
         self.player.draw(self.display_surface)
 
         self.particle_sprites.update(self.view_shift)

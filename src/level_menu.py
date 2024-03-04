@@ -27,12 +27,16 @@ class LevelMenu:
         path_array = load.import_csv_layout(mapdata['path'])
         path_wall_array = self.create_path_outline(path_array)
         self.path_wall = TiledDynamicPath(background_offset, path_wall_array, path_wall=True)
-        self.path = TiledDynamicPath(background_offset, path_array)
+        path_adjustment = (0,-12) # align with player sprite feet
+        self.path = TiledDynamicPath(background_offset + path_adjustment, path_array)
+
+        level_portals_array = load.import_csv_layout(mapdata['portal'])
+        self.level_portals = LevelPortalsBackground(background_offset, level_portals_array)
 
         self.player = pg.sprite.GroupSingle()
         self.player.add(LevelMenuPlayer(player_pos, self.display_surface))
 
-    def create_path_outline(self, path_array: List[List[str]]):
+    def create_path_outline(self, path_array: List[List[str]]) -> List[List[str]]:
         height, width = len(path_array), len(path_array[0])
         new_path = np.full((width, height), NULL_TILEID)
         for ri, r in enumerate(path_array):
@@ -116,6 +120,9 @@ class LevelMenu:
         self.path_wall.update(self.view_shift)
         if self.debug_mode: self.path_wall.draw(self.display_surface)
 
+        self.level_portals.update(self.view_shift)
+        self.level_portals.draw(self.display_surface)
+        
         self.player.update()
         self.move_player()
         self.player.draw(self.display_surface)

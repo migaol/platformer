@@ -30,7 +30,8 @@ world_data = [
             'assets_path':  './assets/level/level_1/',
             'player':       './leveldata/1/1-levelmap/1-levelmap_player.csv',
             'terrain':      './leveldata/1/1-levelmap/1-levelmap_terrain.csv',
-            'path':         './leveldata/1/1-levelmap/1-levelmap_path.csv'
+            'path':         './leveldata/1/1-levelmap/1-levelmap_path.csv',
+            'portal':       './leveldata/1/1-levelmap/1-levelmap_levels.csv'
         },
         'levels': [
             level_1_1

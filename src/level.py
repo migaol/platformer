@@ -49,7 +49,7 @@ class Level:
         static_tiles, img_filenames = load.import_folder(folder_path + 'static')
         for ri, r in enumerate(layout):
             for ci, c in enumerate(r):
-                if c == '-1': continue
+                if c == NULL_TILEID: continue
                 pos = pg.Vector2(ci*TILE_SIZE, ri*TILE_SIZE)
                 c = int(c)
                 if type == 'terrain':

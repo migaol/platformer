@@ -66,3 +66,13 @@ class StaticBackgroundTile(SquareTile):
     def update(self, shift: pg.Vector2):
         self.rect.x += shift.x
         self.rect.y += shift.y
+
+class VariableStaticBackgroundTile(StaticBackgroundTile):
+    def __init__(self, pos: pg.Vector2, size: int, surface_states: List[pg.Surface], initial_state: int = 0):
+        super().__init__(pos, size, surface_states[initial_state])
+        self.surface_states = surface_states
+        self.state = initial_state
+
+    def set_state(self, state: int):
+        self.state = state
+        self.image = self.surface_states[state]

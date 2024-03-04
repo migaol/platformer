@@ -60,18 +60,18 @@ class TiledDynamicPath(pg.sprite.Group):
 class LevelPortalsBackground(pg.sprite.Group):
     def __init__(self, topleft: pg.Vector2, layout: List[List[str]]) -> None:
         super().__init__()
-        tile_states = [
-            pg.image.load('./assets/level/level_hidden.png'),
-            pg.image.load('./assets/level/level_new.png'),
-            pg.image.load('./assets/level/level_clear.png')
-        ]
         n_levels = max([int(c) for r in layout for c in r])
         self.level_portals = [None]*n_levels
         for ri, r in enumerate(layout):
             for ci, c in enumerate(r):
                 if c == NULL_TILEID: continue
                 pos = pg.Vector2(ci*TILE_SIZE, ri*TILE_SIZE) - topleft
-                sprite = VariableStaticBackgroundTile(pos, TILE_SIZE, tile_states, 0) # TODO: align center
+                tile_states = [
+                    pg.image.load('./assets/level/level_hidden.png').convert_alpha(),
+                    pg.image.load('./assets/level/level_new.png').convert_alpha(),
+                    pg.image.load('./assets/level/level_clear.png').convert_alpha()
+                ]
+                sprite = LevelPortalBackgroundTile(pos, TILE_SIZE, int(c), tile_states, 0)
                 self.level_portals[int(c)-1] = sprite
                 self.add(sprite)
 

@@ -29,7 +29,7 @@ class LevelMenu:
         self.path = TiledDynamicPath(background_offset + path_adjustment, path_array)
 
         level_portals_array = load.import_csv_layout(mapdata['portal'])
-        self.level_portals = LevelPortalsBackground(background_offset, level_portals_array)
+        self.level_portals = LevelPortalsBackground(background_offset + path_adjustment, level_portals_array)
 
         self.player = pg.sprite.GroupSingle()
         self.player.add(LevelMenuPlayer(player_pos, self.display_surface))

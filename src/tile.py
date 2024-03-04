@@ -76,3 +76,16 @@ class VariableStaticBackgroundTile(StaticBackgroundTile):
     def set_state(self, state: int) -> None:
         self.state = state
         self.image = self.surface_states[state]
+
+class LevelPortalBackgroundTile(VariableStaticBackgroundTile):
+    def __init__(self, pos: pg.Vector2, size: int, level: int,
+                    surface_states: List[pg.Surface], initial_state: int = 0, font: str = FONT) -> None:
+        super().__init__(pos, size, surface_states, initial_state)
+        self.level = level
+        self.font = pg.font.Font(font, TILE_SIZE//2)
+        self.text = self.font.render(str(self.level), True, 'white')
+        self.text_rect = self.text.get_rect(center=(TILE_SIZE//2, TILE_SIZE//2))
+
+    def update(self, shift: pg.Vector2) -> None:
+        super().update(shift)
+        self.image.blit(self.text, self.text_rect)

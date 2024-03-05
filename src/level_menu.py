@@ -110,8 +110,9 @@ class LevelMenu:
     def get_player_pos(self) -> Tuple[int, int]:
         return self.player.sprite.rect.center
     
-    def get_level(self) -> Tuple[int, int]:
+    def get_level(self) -> Tuple[int, int] | None:
         collided_levels: List[LevelPortalBackgroundTile] = pg.sprite.spritecollide(self.player.sprite, self.level_portals, False)
+        if not collided_levels: return None
         return (self.current_world, collided_levels[0].level)
 
     def run(self) -> None:

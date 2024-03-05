@@ -26,7 +26,7 @@ class Game:
         self.score = 0
 
     def create_level(self, level: Tuple[int, int]) -> None:
-        self.level = Level(current_level=level, surface=screen, debug_mode=debug_mode)
+        self.level = Level(level=level, surface=screen, debug_mode=debug_mode)
         self.display_mode = 'level'
 
     def add_health(self, amount: int) -> None:
@@ -39,7 +39,8 @@ class Game:
 
     def click(self, pos: Tuple) -> None:
         if self.display_mode == 'level_menu':
-            self.create_level(self.level_menu.get_level())
+            selected_level = self.level_menu.get_level()
+            if selected_level: self.create_level(selected_level)
 
     def check_game_over(self) -> None:
         if self.player_current_health <= 0:

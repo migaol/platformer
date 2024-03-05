@@ -33,7 +33,7 @@ def import_csv_layout(folder_path: str) -> List[List[str]]:
             terrain_map.append(list(row))
     return terrain_map
 
-def get_spritesheet(folder_path: str, id: int) -> Tuple[str, int, int]:
+def import_spritesheet(folder_path: str, id: int) -> Tuple[str, int, int]:
     for _, _, filenames in os.walk(folder_path):
         for file in sorted(filenames):
             if re.match(r"^frames.*\.png$", file):

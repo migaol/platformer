@@ -14,7 +14,7 @@ from settings import *
 from leveldata import world_data
 
 class Level:
-    def __init__(self, current_level: Tuple[int, int], surface: pg.Surface, debug_mode: bool = False) -> None:
+    def __init__(self, level: Tuple[int, int], surface: pg.Surface, debug_mode: bool = False) -> None:
         random.seed(1)
         self.display_surface = surface
         self.debug_mode = debug_mode
@@ -24,10 +24,9 @@ class Level:
         self.player_movement = pg.Vector2(0, 0)
         self.global_animation_frame = 0
 
-        self.current_level = current_level
-        current_world = self.current_level[0]-1
-        current_stage = self.current_level[1]-1
-        level_data = world_data[current_world]['levels'][current_stage]
+        current_world = level[0]-1
+        current_level = level[1]-1
+        level_data = world_data[current_world]['levels'][current_level]
 
         self._setup_entities(load.import_csv_layout(level_data['entities']))
 
@@ -60,7 +59,7 @@ class Level:
                     tile_img = terrain_tiles[c]
                     sprite = StaticSquareTile(pos, TILE_SIZE, tile_img)
                 elif type.startswith('animated_'):
-                    png_path, frame_width, frame_height = load.get_spritesheet(folder_path + 'animated', c)
+                    png_path, frame_width, frame_height = load.import_spritesheet(folder_path + 'animated', c)
                     animation_frames = load.import_tilesheet(png_path, frame_width, frame_height)
                     pos = pg.Vector2(ci*TILE_SIZE, (ri+1)*TILE_SIZE - frame_height)
                     sprite = AnimatedTile(pos, frame_width, frame_height, animation_frames)

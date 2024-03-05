@@ -14,19 +14,19 @@ class Game:
         self.surface = surface
         self.debug_mode = debug_mode
 
-        self.unlocked_levels = [0]
-        self.current_level = (1,1)
+        self.current_world = 1
 
-        self.level_menu = LevelMenu(surface=self.surface, current_world=self.current_level[0], debug_mode=self.debug_mode)
+        self.level_menu = LevelMenu(surface=self.surface, current_world=self.current_world, debug_mode=self.debug_mode)
         self.display_mode = 'level_menu'
         
         self.player_lives = PLAYER_LIVES
         self.player_max_health = PLAYER_MAX_HEALTH
         self.player_current_health = PLAYER_MAX_HEALTH
         self.coins = 0
+        self.score = 0
 
-    def create_level(self) -> None:
-        self.level = Level(current_level=self.current_level, surface=screen, debug_mode=debug_mode)
+    def create_level(self, level: Tuple[int, int]) -> None:
+        self.level = Level(current_level=level, surface=screen, debug_mode=debug_mode)
         self.display_mode = 'level'
 
     def add_health(self, amount: int) -> None:
@@ -34,12 +34,12 @@ class Game:
 
     def get_input(self) -> None:
         pressed = pg.key.get_pressed()
-        if pressed[KEY_SELECT]:
-            self.create_level()
+        if pressed[KEY_SELECT] and self.display_mode == 'level_menu':
+            self.click(self.level_menu.get_player_pos())
 
     def click(self, pos: Tuple) -> None:
         if self.display_mode == 'level_menu':
-            self.create_level()
+            self.create_level(self.level_menu.get_level())
 
     def check_game_over(self) -> None:
         if self.player_current_health <= 0:

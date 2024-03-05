@@ -1,7 +1,7 @@
 import pygame as pg
 import numpy as np
 import random
-from typing import List
+from typing import List, Tuple
 import load
 from tile import *
 from bg import *
@@ -13,10 +13,10 @@ class LevelMenu:
         self.display_surface = surface
         self.debug_mode = debug_mode
 
-        self.current_world = current_world-1
+        self.current_world = current_world
 
         self.view_shift = pg.Vector2(0, 0)
-        mapdata = world_data[self.current_world]['map']
+        mapdata = world_data[self.current_world-1]['map']
         player_pos = pg.Vector2(SCREEN_WIDTH//2 - TILE_SIZE//2, SCREEN_HEIGHT//2 - TILE_SIZE//2)
         background_offset = np.where(np.array(load.import_csv_layout(mapdata['player'])) == PLAYER_INITIALPOS_TILEID)
         background_offset = pg.Vector2(background_offset[1][0]*TILE_SIZE, background_offset[0][0]*TILE_SIZE) - player_pos
@@ -31,8 +31,7 @@ class LevelMenu:
         level_portals_array = load.import_csv_layout(mapdata['portal'])
         self.level_portals = LevelPortalsBackground(background_offset + path_adjustment, level_portals_array)
 
-        self.player = pg.sprite.GroupSingle()
-        self.player.add(LevelMenuPlayer(player_pos, self.display_surface))
+        self.player = pg.sprite.GroupSingle(LevelMenuPlayer(player_pos, self.display_surface))
 
     def _setup_path_outline(self, path_array: List[List[str]]) -> List[List[str]]:
         height, width = len(path_array), len(path_array[0])
@@ -107,6 +106,13 @@ class LevelMenu:
             player.on_ceiling = False
         if player.on_right and collision_y and (player.rect.right > collision_y or player.direction.y <= 0):
             player.on_right = False
+
+    def get_player_pos(self) -> Tuple[int, int]:
+        return self.player.sprite.rect.center
+    
+    def get_level(self) -> Tuple[int, int]:
+        collided_levels: List[LevelPortalBackgroundTile] = pg.sprite.spritecollide(self.player.sprite, self.level_portals, False)
+        return (self.current_world, collided_levels[0].level)
 
     def run(self) -> None:
         self._animate_scroll()

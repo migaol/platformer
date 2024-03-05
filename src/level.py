@@ -2,7 +2,7 @@ import pygame as pg
 import numpy as np
 from PIL import Image
 import random
-from typing import List, Dict, Any
+from typing import List, Tuple, Dict, Any
 import load
 from gui import Gui
 from player import Player
@@ -14,7 +14,7 @@ from settings import *
 from leveldata import world_data
 
 class Level:
-    def __init__(self, current_level: List[int], surface: pg.Surface, debug_mode: bool = False) -> None:
+    def __init__(self, current_level: Tuple[int, int], surface: pg.Surface, debug_mode: bool = False) -> None:
         random.seed(1)
         self.display_surface = surface
         self.debug_mode = debug_mode

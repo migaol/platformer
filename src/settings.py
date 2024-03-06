@@ -8,6 +8,14 @@ class TileID(StrEnum):
     NONE = '-1'
     PLAYER = '0'
     DUMMY = '1'
+    STAR = '2'
+    GEM_RED = '3'
+    GEM_BLUE = '4'
+    GEM_GREEN = '5'
+    POTION_HEALTH = '6'
+    CRATE_CROSS = '7'
+    CRATE_SQUARE = '8'
+    CRATE_SLASH = '9'
 
 # font
 FONT = "./assets/font/Pixellari.ttf"
@@ -60,7 +68,10 @@ PLAYER_MAX_JUMPS = 2
 PLAYER_JUMP_SPEED = -21
 PLAYER_GRAVITY = 0.75
 PLAYER_TERMINAL_VELOCITY = 10
-PLAYER_HITBOX = (48, 48) # TODO: implement
+PLAYER_HITBOX = (48,48) # TODO: implement
+
+# entity behavior
+ENTITY_GEM_HITBOX = (48,48)
 
 # enemy behavior
 ENEMY_DUMMY_SPEED = 5

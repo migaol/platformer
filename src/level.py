@@ -9,6 +9,7 @@ from player import Player
 from particles import ParticleEffect
 from tile import *
 from bg import *
+from entity import *
 from enemy import *
 from settings import *
 from leveldata import world_data
@@ -75,14 +76,16 @@ class Level:
     def _setup_entities(self, layout: List[List[str]]) -> None:
         self.player = pg.sprite.GroupSingle()
         self.enemies = pg.sprite.Group()
+        self.gems = pg.sprite.Group()
         for ri,r in enumerate(layout):
             for ci,c in enumerate(r):
                 pos = pg.Vector2(ci*TILE_SIZE, ri*TILE_SIZE)
                 if c == TileID.PLAYER:
                     self.player.add(Player(pos, self.display_surface))
+                if c in [TileID.GEM_RED, TileID.GEM_BLUE, TileID.GEM_GREEN]:
+                    self.gems.add(Gem(pos, TILE_SIZE, TILE_SIZE, c))
                 elif c == 'z':
                     enemy = TestEnemy(pos, self.display_surface)
-                    enemy.set_lethal_hitbox(0, 0, 0, 0)
                     self.enemies.add(enemy)
 
     def _setup_background(self) -> None:
@@ -171,6 +174,7 @@ class Level:
 
     def _update_player_enemy_collision(self) -> None:
         player: Player = self.player.sprite
+        enemy: Enemy
         for enemy in self.enemies.sprites():
             if enemy.rect.colliderect(player.rect) and player.animation_state != 'hurt':
                 if enemy.collide_lethal_hitbox(player.rect):
@@ -244,6 +248,9 @@ class Level:
         self._update_enemy_vertical_movement()
         self.enemies.draw(self.display_surface)
 
+        self.gems.update(self.view_shift, self.global_animation_frame)
+        self.gems.draw(self.display_surface)
+
         self.player.update()
         self._update_player_horizontal_movement()
         self._update_player_vertical_movement()
@@ -257,6 +264,10 @@ class Level:
 
         if self.debug_mode:
             self.debug_draw_hitbox(self.player.sprite.rect, 'hitbox')
+            enemy: Enemy
             for enemy in self.enemies.sprites():
                 self.debug_draw_hitbox(enemy.rect, 'hitbox')
-                self.debug_draw_hitbox(enemy.get_lethal_hitbox(), 'lethal')
+                self.debug_draw_hitbox(enemy.lethal_hitbox.get_hitbox(enemy.rect), 'lethal')
+            gem: Gem
+            for gem in self.gems.sprites():
+                self.debug_draw_hitbox(gem.hitbox.get_hitbox(gem.rect), 'lethal')

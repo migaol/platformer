@@ -1,18 +1,14 @@
 import pygame as pg
 from settings import *
 import load
-
-class LethalHitbox:
-    def __init__(self, pos: pg.Vector2, w: int, h: int) -> None:
-        self.x, self.y = pos
-        self.w, self.h = w, h
+from entity import Hitbox
 
 class Enemy(pg.sprite.Sprite):
     def __init__(self, pos: pg.Vector2, surface: pg.Surface) -> None:
         super().__init__()
         self.image = pg.image.load('./assets/test_direction.png').convert_alpha()
-        self.rect = self.image.get_rect(topleft = (pos))
-        self.lethal_hitbox = LethalHitbox(0, self.rect.h//2, self.rect.w, self.rect.h//2)
+        self.rect = self.image.get_rect(topleft=pos)
+        self.lethal_hitbox = Hitbox(0, self.rect.h//2, self.rect.w, self.rect.h//2)
 
         self.display_surface = surface
 
@@ -26,15 +22,8 @@ class Enemy(pg.sprite.Sprite):
         self.lethal_hitbox.w = self.rect.w - (left+right) * self.rect.w
         self.lethal_hitbox.h = self.rect.h - (bottom+top) * self.rect.h
 
-    def collide_lethal_hitbox(self, rect: pg.Rect) -> bool:
-        return rect.colliderect(
-            self.rect.x + self.lethal_hitbox.x, self.rect.y + self.lethal_hitbox.y,
-            self.lethal_hitbox.w, self.lethal_hitbox.h)
-
-    def get_lethal_hitbox(self) -> pg.Rect:
-        return pg.Rect(
-            self.rect.x + self.lethal_hitbox.x, self.rect.y + self.lethal_hitbox.y,
-            self.lethal_hitbox.w, self.lethal_hitbox.h)
+    def collide_lethal_hitbox(self, other: pg.Rect) -> bool:
+        return self.lethal_hitbox.collide_hitbox(self.rect, other)
 
     def update_gravity(self) -> None:
         self.velocity.y += min(self.gravity, self.terminal_velocity)

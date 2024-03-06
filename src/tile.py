@@ -1,8 +1,7 @@
 import pygame as pg
 from typing import List
-import load
-from settings import *
 import random
+from settings import *
 
 class SquareTile(pg.sprite.Sprite):
     def __init__(self, pos: pg.Vector2, size: int) -> None:

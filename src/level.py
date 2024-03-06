@@ -52,7 +52,7 @@ class Level:
         static_tiles, img_filenames = load.import_folder(folder_path + 'static')
         for ri, r in enumerate(layout):
             for ci, c in enumerate(r):
-                if c == NULL_TILEID: continue
+                if c == TileID.NONE: continue
                 pos = pg.Vector2(ci*TILE_SIZE, ri*TILE_SIZE)
                 c = int(c)
                 if type == 'terrain':
@@ -77,11 +77,11 @@ class Level:
         self.enemies = pg.sprite.Group()
         for ri,r in enumerate(layout):
             for ci,c in enumerate(r):
-                x, y = ci*TILE_SIZE, ri*TILE_SIZE
-                if c == '0':
-                    self.player.add(Player(pg.Vector2(x,y), self.display_surface))
+                pos = pg.Vector2(ci*TILE_SIZE, ri*TILE_SIZE)
+                if c == TileID.PLAYER:
+                    self.player.add(Player(pos, self.display_surface))
                 elif c == 'z':
-                    enemy = TestEnemy(x, y, self.display_surface)
+                    enemy = TestEnemy(pos, self.display_surface)
                     enemy.set_lethal_hitbox(0, 0, 0, 0)
                     self.enemies.add(enemy)
 
@@ -194,8 +194,9 @@ class Level:
                     enemy.reverse()
 
     def _update_enemy_vertical_movement(self) -> None:
+        enemy: Enemy
         for enemy in self.enemies.sprites():
-            enemy.apply_gravity()
+            enemy.update_gravity()
             for sprite in self.terrain_tiles.sprites():
                 if sprite.rect.colliderect(enemy.rect):
                     if enemy.velocity.y > 0:

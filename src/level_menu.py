@@ -18,7 +18,7 @@ class LevelMenu:
         self.view_shift = pg.Vector2(0, 0)
         mapdata = world_data[self.current_world-1]['map']
         player_pos = pg.Vector2(SCREEN_WIDTH//2 - TILE_SIZE//2, SCREEN_HEIGHT//2 - TILE_SIZE//2)
-        background_offset = np.where(np.array(load.import_csv_layout(mapdata['player'])) == PLAYER_INITIALPOS_TILEID)
+        background_offset = np.where(np.array(load.import_csv_layout(mapdata['player'])) == '0')
         background_offset = pg.Vector2(background_offset[1][0]*TILE_SIZE, background_offset[0][0]*TILE_SIZE) - player_pos
         self.background = TiledDynamicBackground(background_offset, load.import_csv_layout(mapdata['terrain']), mapdata['assets_path'])
 
@@ -35,18 +35,18 @@ class LevelMenu:
 
     def _setup_path_outline(self, path_array: List[List[str]]) -> List[List[str]]:
         height, width = len(path_array), len(path_array[0])
-        new_path = np.full((width, height), NULL_TILEID)
+        new_path = np.full((width, height), TileID.NONE)
         for ri, r in enumerate(path_array):
             for ci, c in enumerate(r):
-                if c == NULL_TILEID: continue
-                if ri > 0 and path_array[ri-1][ci] == NULL_TILEID:
-                    new_path[ri-1][ci] = PATH_TILEID
-                if ri < height and path_array[ri+1][ci] == NULL_TILEID:
-                    new_path[ri+1][ci] = PATH_TILEID
-                if ci > 0 and path_array[ri][ci-1] == NULL_TILEID:
-                    new_path[ri][ci-1] = PATH_TILEID
-                if ci < width and path_array[ri][ci+1] == NULL_TILEID:
-                    new_path[ri][ci+1] = PATH_TILEID
+                if c == TileID.NONE: continue
+                if ri > 0 and path_array[ri-1][ci] == TileID.NONE:
+                    new_path[ri-1][ci] = TileID.DUMMY
+                if ri < height and path_array[ri+1][ci] == TileID.NONE:
+                    new_path[ri+1][ci] = TileID.DUMMY
+                if ci > 0 and path_array[ri][ci-1] == TileID.NONE:
+                    new_path[ri][ci-1] = TileID.DUMMY
+                if ci < width and path_array[ri][ci+1] == TileID.NONE:
+                    new_path[ri][ci+1] = TileID.DUMMY
         return new_path
 
     def _animate_scroll(self) -> None:

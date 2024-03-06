@@ -1,11 +1,13 @@
 import pygame as pg
+from enum import StrEnum
 
 # render
 VERTICAL_TILES = 14
 TILE_SIZE = 64
-NULL_TILEID = '-1'
-PLAYER_INITIALPOS_TILEID = '0'
-PATH_TILEID = '1'
+class TileID(StrEnum):
+    NONE = '-1'
+    PLAYER = '0'
+    DUMMY = '1'
 
 # font
 FONT = "./assets/font/Pixellari.ttf"

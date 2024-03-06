@@ -39,7 +39,7 @@ class TiledDynamicBackground(pg.sprite.Group):
         terrain_tiles = load.import_tilesheet(folder_path + 'map_tiles.png')
         for ri, r in enumerate(layout):
             for ci, c in enumerate(r):
-                if c == NULL_TILEID: continue
+                if c == TileID.NONE: continue
                 pos = pg.Vector2(ci*TILE_SIZE, ri*TILE_SIZE) - topleft
                 tile_img = terrain_tiles[int(c)]
                 sprite = StaticBackgroundTile(pos, TILE_SIZE, tile_img)
@@ -51,9 +51,9 @@ class TiledDynamicPath(pg.sprite.Group):
         if not path_wall: path_tiles = load.import_tilesheet('./assets/level/level_1/map_tiles.png')
         for ri, r in enumerate(layout):
             for ci, c in enumerate(r):
-                if c == NULL_TILEID: continue
+                if c == TileID.NONE: continue
                 pos = pg.Vector2(ci*TILE_SIZE, ri*TILE_SIZE) - topleft
-                tile_img = pg.image.load('./assets/level/entities/01_path.png') if path_wall else path_tiles[int(c)]
+                tile_img = pg.image.load('./assets/level/entities/01_dummy.png') if path_wall else path_tiles[int(c)]
                 sprite = StaticBackgroundTile(pos, TILE_SIZE, tile_img)
                 self.add(sprite)
 
@@ -64,7 +64,7 @@ class LevelPortalsBackground(pg.sprite.Group):
         self.level_portals = [None]*n_levels
         for ri, r in enumerate(layout):
             for ci, c in enumerate(r):
-                if c == NULL_TILEID: continue
+                if c == TileID.NONE: continue
                 pos = pg.Vector2(ci*TILE_SIZE, ri*TILE_SIZE) - topleft
                 tile_states = [
                     pg.image.load('./assets/level/level_hidden.png').convert_alpha(),

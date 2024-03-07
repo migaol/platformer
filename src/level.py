@@ -63,13 +63,11 @@ class Level:
                     png_path, frame_width, frame_height = load.import_spritesheet(folder_path + 'animated', c)
                     animation_frames = load.import_tilesheet(png_path, frame_width, frame_height)
                     pos = pg.Vector2(ci*TILE_SIZE, (ri+1)*TILE_SIZE - frame_height)
-                    sprite = AnimatedTile(pos, frame_width, frame_height, animation_frames)
+                    sprite = AnimatedTile(pos, animation_frames)
                 elif type.startswith('static_'):
                     image = Image.open(img_filenames[c])
-                    image_width = image.width
-                    image_height = image.height
-                    pos = pg.Vector2(ci*TILE_SIZE, (ri+1)*TILE_SIZE - image_height)
-                    sprite = StaticTile(pos, image_width, image_height, static_tiles[c])
+                    pos = pg.Vector2(ci*TILE_SIZE, (ri+1)*TILE_SIZE - image.height)
+                    sprite = StaticTile(pos, static_tiles[c])
                 sprite_group.add(sprite)
         return sprite_group
 
@@ -86,7 +84,7 @@ class Level:
                 if c == TileID.PLAYER:
                     self.player.add(Player(pos, self.display_surface))
                 if c in [TileID.GEM_RED, TileID.GEM_BLUE, TileID.GEM_GREEN]:
-                    self.gems.add(Gem(pos, TILE_SIZE, TILE_SIZE, c))
+                    self.gems.add(Gem(pos, c))
                 elif c == 'z':
                     enemy = TestEnemy(pos, self.display_surface)
                     self.enemies.add(enemy)

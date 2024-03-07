@@ -1,5 +1,6 @@
 import pygame as pg
 from typing import List
+from abc import ABC, abstractmethod
 import random
 from settings import *
 
@@ -7,7 +8,7 @@ class SquareTile(pg.sprite.Sprite):
     def __init__(self, pos: pg.Vector2, size: int) -> None:
         super().__init__()
         self.image = pg.Surface((size, size))
-        self.rect = self.image.get_rect(topleft = pos)
+        self.rect = self.image.get_rect(topleft=pos)
 
     def update(self, xshift: int) -> None:
         self.rect.x += xshift
@@ -23,38 +24,33 @@ class StaticSquareTile(SquareTile):
         super().__init__(pos, size)
         self.image = surface
 
-class Tile(pg.sprite.Sprite):
-    def __init__(self, pos: pg.Vector2, width: int, height: int) -> None:
+class Tile(pg.sprite.Sprite, ABC):
+    def __init__(self) -> None:
         super().__init__()
-        self.image = pg.Surface((width, height))
-        self.rect = self.image.get_rect(topleft = pos)
 
     def update(self, xshift: int) -> None:
         self.rect.x += xshift
 
 class StaticTile(Tile):
-    def __init__(self, pos: pg.Vector2, width: int, height: int, image: pg.Surface) -> None:
-        super().__init__(pos, width, height)
+    def __init__(self, pos: pg.Vector2, image: pg.Surface) -> None:
+        super().__init__()
         self.image = image
-        self.rect = self.image.get_rect(topleft = pos)
-
-    def update(self, xshift: int) -> None:
-        self.rect.x += xshift
+        self.rect = self.image.get_rect(topleft=pos)
 
 class AnimatedTile(Tile):
-    def __init__(self, pos: pg.Vector2, width: int, height: int, animation_frames: List[pg.Surface]) -> None:
-        super().__init__(pos, width, height)
+    def __init__(self, pos: pg.Vector2, animation_frames: List[pg.Surface]) -> None:
+        super().__init__()
         self.animation_frames = animation_frames
         self.frame_offset = random.randint(0, len(self.animation_frames)-1)
         self.image = self.animation_frames[self.frame_offset]
-        self.rect = self.image.get_rect(topleft = pos)
+        self.rect = self.image.get_rect(topleft=pos)
 
     def animate(self, global_animation_frame: float) -> None:
         animation_frame = (int(global_animation_frame) + self.frame_offset) % len(self.animation_frames)
         self.image = self.animation_frames[int(animation_frame)]
 
     def update(self, xshift: int, global_animation_frame: float) -> None:
-        self.rect.x += xshift
+        super().update(xshift)
         self.animate(global_animation_frame)
 
 class StaticBackgroundTile(SquareTile):

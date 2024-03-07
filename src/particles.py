@@ -24,10 +24,8 @@ class ParticleEffect(pg.sprite.Sprite):
 
     def animate(self) -> None:
         self.frame_index += self.animation_speed
-        if self.frame_index >= len(self.frames):
-            self.kill()
-        else:
-            self.image = self.frames[int(self.frame_index)]
+        if self.frame_index >= len(self.frames): self.kill()
+        else: self.image = self.frames[int(self.frame_index)]
 
     def update(self, xshift) -> None:
         self.animate()

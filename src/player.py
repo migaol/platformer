@@ -12,7 +12,7 @@ class Player(pg.sprite.Sprite):
         self.animation_state = 'idle'
         self.animation_frame = 0
         self.image: pg.Surface = self.animations['idle'][0]
-        self.rect = self.image.get_rect(topleft = pos)
+        self.rect = self.image.get_rect(topleft=pos)
 
         self.current_hp = PLAYER_HEALTH
         self.max_hp = PLAYER_MAX_HEALTH
@@ -44,12 +44,9 @@ class Player(pg.sprite.Sprite):
 
     def get_input(self) -> None:
         pressed = pg.key.get_pressed()
-        if pressed[KEY_SPRINT]:
-            self.speed_mode = PLAYER_SPRINT_MULTIPLIER
-        elif pressed[KEY_SNEAK]:
-            self.speed_mode = PLAYER_SNEAK_MULTIPLIER
-        else:
-            self.speed_mode = PLAYER_WALK_MULTIPLIER
+        if   pressed[KEY_SPRINT]:   self.speed_mode = PLAYER_SPRINT_MULTIPLIER
+        elif pressed[KEY_SNEAK]:    self.speed_mode = PLAYER_SNEAK_MULTIPLIER
+        else:                       self.speed_mode = PLAYER_WALK_MULTIPLIER
         
         if pressed[KEY_RIGHT]:
             self.velocity.x = self.max_momentum * self.speed_mode
@@ -58,32 +55,26 @@ class Player(pg.sprite.Sprite):
             self.velocity.x = -self.max_momentum * self.speed_mode
             self.facing_right = False
         else:
-            if -self.inertia/2 <= self.velocity.x <= self.inertia/2:
-                self.velocity.x = 0
-            elif self.velocity.x > 0:
-                self.velocity.x -= self.inertia
-            elif self.velocity.x < 0:
-                self.velocity.x += self.inertia
+            if   abs(self.velocity.x) <= self.inertia/2:    self.velocity.x = 0
+            elif self.velocity.x > 0:                       self.velocity.x -= self.inertia
+            elif self.velocity.x < 0:                       self.velocity.x += self.inertia
 
-        if pressed[KEY_JUMP] and self.can_jump():
-            self.jump()
+        if pressed[KEY_JUMP] and self.can_jump(): self.jump()
 
     def update_gravity(self) -> None:
         self.velocity.y += min(self.gravity, self.terminal_velocity)
         self.rect.y += self.velocity.y
-        if self.jump_cooldown > -1:
-            self.jump_cooldown -= 1
+        if self.jump_cooldown > -1: self.jump_cooldown -= 1
 
     def can_jump(self) -> None:
-        return (self.on_ground or self.jumps > 0) and self.jump_cooldown <= 0
+        return (self.on_ground or self.jumps > 0) and (self.jump_cooldown <= 0)
 
     def jump(self) -> None:
         self.velocity.y = self.jump_speed
         self.jumps -= 1
         self.jump_cooldown = PLAYER_JUMP_COOLDOWN
         self.animation_frame = 0
-        if self.animation_state != 'hurt':
-            self.animation_state = 'jump'
+        if self.animation_state != 'hurt': self.animation_state = 'jump'
 
     def _animate(self) -> None:
         self.animation_frame += DEFAULT_ANIMATION_SPEED
@@ -112,24 +103,18 @@ class Player(pg.sprite.Sprite):
         self.animation_state = 'land'
 
     def _update_animation_state(self) -> None:
-        if self.animation_state == 'hurt' and self.animation_frame < len(self.animations['hurt']):
-            return
+        if self.animation_state == 'hurt' and self.animation_frame < len(self.animations['hurt']): return
         if self.velocity.y != 0:
             if ((self.animation_state != 'jump' and self.animation_state != 'land')
                 or self.animation_frame >= len(self.animations['jump']) - DEFAULT_ANIMATION_SPEED):
                 self.animation_state = 'airborne'
         elif self.velocity.x != 0:
-            if not self.on_ground:
-                self.animation_state = 'airborne'
-            elif self.speed_mode == PLAYER_SPRINT_MULTIPLIER:
-                self.animation_state = 'sprint'
-            elif self.speed_mode == PLAYER_SNEAK_MULTIPLIER:
-                self.animation_state = 'sneak'
-            else:
-                self.animation_state = 'walk'
+            if   not self.on_ground:                            self.animation_state = 'airborne'
+            elif self.speed_mode == PLAYER_SPRINT_MULTIPLIER:   self.animation_state = 'sprint'
+            elif self.speed_mode == PLAYER_SNEAK_MULTIPLIER:    self.animation_state = 'sneak'
+            else:                                               self.animation_state = 'walk'
         else:
-            if self.animation_frame >= len(self.animations['land']):
-                self.animation_state = 'idle'
+            if self.animation_frame >= len(self.animations['land']): self.animation_state = 'idle'
 
     def damage(self) -> None:
         self.current_hp -= 1

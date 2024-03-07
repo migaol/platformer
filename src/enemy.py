@@ -43,6 +43,6 @@ class TestEnemy(Enemy):
     def __init__(self, pos: pg.Vector2, surface: pg.Surface) -> None:
         super().__init__(pos, surface)
         self.image = pg.image.load('./assets/test_direction.png').convert_alpha()
-        self.rect = self.image.get_rect(topleft = (pos))
+        self.rect = self.image.get_rect(topleft=pos)
 
         self.velocity.x = ENEMY_BASIC_SPEED

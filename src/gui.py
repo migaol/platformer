@@ -1,8 +1,8 @@
 import pygame as pg
 import numpy as np
 from settings import *
-from player import Player
 import load
+from player import Player
 
 class Gui:
     def __init__(self, surface: pg.Surface, level: int, player: Player) -> None:
@@ -74,11 +74,11 @@ class AttributeBar:
         def animate_change(self, animation_frame: float, transition_frames: int, max_val: int) -> None:
             if animation_frame <= transition_frames:
                 new_width = (
-                    (self.val_change_target/max_val) * self.full_width +
+                    (self.val_change_target/max_val)*self.full_width +
                     ((transition_frames-animation_frame)/transition_frames) * (self.val_change_amount/max_val)*self.full_width)
                 self.image = pg.transform.scale(self.image, (new_width, self.height))
             else:
-                self.image = pg.transform.scale(self.image, ((self.val_change_target/max_val) * self.full_width, self.height))
+                self.image = pg.transform.scale(self.image, ((self.val_change_target/max_val)*self.full_width, self.height))
             self.draw()
 
     class BarLost(BarBase):
@@ -90,7 +90,7 @@ class AttributeBar:
 
         def reduce_val(self, new_val: int, amount: int, max_val: int) -> None:
             self.pos.x = self.default_pos.x + (new_val/max_val) * self.full_width
-            self.image = pg.transform.scale(self.image, ((amount/max_val) * self.full_width, self.height))
+            self.image = pg.transform.scale(self.image, ((amount/max_val)*self.full_width, self.height))
         
         def animate_change(self, animation_frame: float) -> None:
             if int(animation_frame) % 2 == 0:

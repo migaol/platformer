@@ -1,11 +1,10 @@
 import pygame as pg
-import sys, time
+import sys, time, tracemalloc
 from typing import Tuple
-from level import Level
-from level_menu import LevelMenu
 from settings import *
 from leveldata import *
-import tracemalloc
+from level import Level
+from level_menu import LevelMenu
 
 debug_mode = True
 

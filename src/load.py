@@ -104,8 +104,8 @@ def import_tilesheet(png_path: str, frame_width: int = TILE_SIZE, frame_height: 
         `List[pg.Surface]`: List of cut images converted to `pygame.surface`
     """
     surface = pg.image.load(png_path).convert_alpha()
-    numx = surface.get_size()[0] // frame_width
-    numy = surface.get_size()[1] // frame_height
+    dimx, dimy = surface.get_size()
+    numx, numy = dimx//frame_width, dimy//frame_height
 
     cut_tiles = []
     for r in range(numy):

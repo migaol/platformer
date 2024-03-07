@@ -1,6 +1,6 @@
 import pygame as pg
 from typing import List
-from abc import ABC, abstractmethod
+from abc import ABC
 import random
 from settings import *
 

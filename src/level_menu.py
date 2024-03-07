@@ -3,10 +3,10 @@ import numpy as np
 import random
 from typing import List, Tuple
 import load
-from tile import *
-from bg import *
 from settings import *
 from leveldata import world_data
+from tile import *
+from bg import *
 
 class LevelMenu:
     def __init__(self, surface: pg.Surface, current_world: int, debug_mode: bool = False) -> None:

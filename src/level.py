@@ -3,6 +3,7 @@ import numpy as np
 from PIL import Image
 import random
 from typing import List, Tuple, Dict, Any
+from settings import *
 import load
 from gui import Gui
 from player import Player
@@ -11,7 +12,6 @@ from tile import *
 from bg import *
 from entity import *
 from enemy import *
-from settings import *
 from leveldata import world_data
 
 class Level:
@@ -38,14 +38,14 @@ class Level:
     def _setup_sprites(self, level_data: Dict[str, Any]) -> None:
         self.particle_sprites = pg.sprite.Group()
 
-        self.terrain_tiles = self._create_tile_group(
-            load.import_csv_layout(level_data['terrain']), level_data['assets_path'], 'terrain')
-        self.animated_z1 = self._create_tile_group(
-            load.import_csv_layout(level_data['animated_z1']), level_data['assets_path'], 'animated_z1')
-        self.static_z1 = self._create_tile_group(
-            load.import_csv_layout(level_data['static_z1']), level_data['assets_path'],'static_z1')
-        self.static_z2 = self._create_tile_group(
-            load.import_csv_layout(level_data['static_z2']), level_data['assets_path'],'static_z2')
+        self.terrain_tiles =    self._create_tile_group(load.import_csv_layout(level_data['terrain']),
+                                                        level_data['assets_path'], 'terrain')
+        self.animated_z1 =      self._create_tile_group(load.import_csv_layout(level_data['animated_z1']),
+                                                        level_data['assets_path'], 'animated_z1')
+        self.static_z1 =        self._create_tile_group(load.import_csv_layout(level_data['static_z1']),
+                                                        level_data['assets_path'],'static_z1')
+        self.static_z2 =        self._create_tile_group(load.import_csv_layout(level_data['static_z2']),
+                                                        level_data['assets_path'],'static_z2')
 
     def _create_tile_group(self, layout: List[List[str]], folder_path: str, type: str) -> pg.sprite.Group:
         sprite_group = pg.sprite.Group()
@@ -94,7 +94,7 @@ class Level:
         composite_layers = []
         for layer_type in bg_files:
             bg_layers = bg_files[layer_type]
-            if layer_type =='static':
+            if layer_type == 'static':
                 for layer_png in bg_layers:
                     composite_layers.append(StaticBackground(0, SCREEN_HEIGHT, layer_png))
             elif layer_type in ['background', 'midground','foreground']:
@@ -120,8 +120,7 @@ class Level:
 
     def _update_player_horizontal_movement(self) -> None:
         player: Player = self.player.sprite
-        if self.view_shift == 0:
-            player.rect.x += player.velocity.x
+        if self.view_shift == 0: player.rect.x += player.velocity.x
 
         for sprite in self.terrain_tiles.sprites():
             if sprite.rect.colliderect(player.rect):
@@ -138,10 +137,8 @@ class Level:
         if player.on_right and (player.rect.right > self.collision_point_x or player.velocity.x <= 0):
             player.on_right = False
         
-        if (not player.on_left) and (not player.on_right):
-            self.player_movement.x = player.velocity.x
-        else:
-            self.player_movement.x = 0
+        if (not player.on_left) and (not player.on_right): self.player_movement.x = player.velocity.x
+        else: self.player_movement.x = 0
     
     def _update_player_vertical_movement(self) -> None:
         player_was_on_ground = self.player.sprite.on_ground
@@ -199,10 +196,8 @@ class Level:
             enemy.move()
             for sprite in self.terrain_tiles.sprites():
                 if sprite.rect.colliderect(enemy.rect):
-                    if enemy.velocity.x < 0:
-                        enemy.rect.left = sprite.rect.right
-                    elif enemy.velocity.x > 0:
-                        enemy.rect.right = sprite.rect.left
+                    if enemy.velocity.x < 0:    enemy.rect.left = sprite.rect.right
+                    elif enemy.velocity.x > 0:  enemy.rect.right = sprite.rect.left
                     enemy.reverse()
 
     def _update_enemy_vertical_movement(self) -> None:
@@ -217,10 +212,8 @@ class Level:
                         enemy.on_ground = True
 
     def debug_draw_hitbox(self, hitbox: pg.Rect, type: str, stroke: int = 4) -> None:
-        if type == 'hitbox':
-            color = HITBOX_COLOR
-        elif type == 'lethal':
-            color = LETHAL_HITBOX_COLOR
+        if   type == 'hitbox':  color = HITBOX_COLOR
+        elif type == 'lethal':  color = LETHAL_HITBOX_COLOR
         pg.draw.rect(self.display_surface, color, hitbox, stroke)
 
     def run(self) -> None:

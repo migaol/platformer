@@ -1,26 +1,31 @@
 import pygame as pg
 from typing import List
+from abc import ABC
+from settings import *
 import load
 from tile import *
-from settings import *
 
-class Background(pg.sprite.Sprite):
+class Background(pg.sprite.Sprite, ABC):
+    def __init__(self) -> None:
+        super().__init__()
+
+class BlankBackground(Background):
     def __init__(self, y: int, height: int, color: str = 'black') -> None:
         super().__init__()
         self.image = pg.Surface((SCREEN_WIDTH, height))
         self.image.fill(color)
-        self.rect = self.image.get_rect(topleft = (0, y))
+        self.rect = self.image.get_rect(topleft=(0, y))
 
 class StaticBackground(Background):
     def __init__(self, y: int, height: int, png_path: str) -> None:
-        super().__init__(y, height)
+        super().__init__()
         self.image = pg.image.load(png_path).convert()
         self.image = pg.transform.scale(self.image, (SCREEN_WIDTH, height))
-        self.rect = self.image.get_rect(topleft = (0, y))
+        self.rect = self.image.get_rect(topleft=(0, y))
 
 class DynamicBackground(Background):
     def __init__(self, pos: pg.Vector2, height: int, parallax_factor: int, png_path: str) -> None:
-        super().__init__(pos.y, height)
+        super().__init__()
         self.image = pg.image.load(png_path).convert()
         self.image = pg.transform.scale(self.image, (SCREEN_WIDTH, height))
         self.rect = self.image.get_rect(topleft = pos)
@@ -28,10 +33,8 @@ class DynamicBackground(Background):
 
     def update(self, player_movement: pg.Vector2) -> None:
         self.rect.x -= player_movement.x * self.parallax_factor
-        if self.rect.right < 0:
-            self.rect.left += 2*SCREEN_WIDTH
-        elif self.rect.left >= SCREEN_WIDTH:
-            self.rect.right -= 2*SCREEN_WIDTH
+        if   self.rect.right < 0:               self.rect.left += 2*SCREEN_WIDTH
+        elif self.rect.left >= SCREEN_WIDTH:    self.rect.right -= 2*SCREEN_WIDTH
 
 class TiledDynamicBackground(pg.sprite.Group):
     def __init__(self, topleft: pg.Vector2, layout: List[List[str]], folder_path: str) -> None:

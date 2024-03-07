@@ -11,7 +11,7 @@ class Player(pg.sprite.Sprite):
         self._load_particle_assets()
         self.animation_state = 'idle'
         self.animation_frame = 0
-        self.image = self.animations['idle'][0]
+        self.image: pg.Surface = self.animations['idle'][0]
         self.rect = self.image.get_rect(topleft = pos)
 
         self.current_hp = PLAYER_HEALTH
@@ -96,32 +96,16 @@ class Player(pg.sprite.Sprite):
         image = animation[int(animation_frame)]
         self.image = image if self.facing_right else pg.transform.flip(image, True, False)
 
-        # if self.on_ground:
-        #     if self.on_right:
-        #         self.rect = self.image.get_rect(bottomright = self.rect.bottomright)
-        #     elif self.on_left:
-        #         self.rect = self.image.get_rect(bottomleft = self.rect.bottomleft)
-        #     else:
-        #         self.rect = self.image.get_rect(midbottom = self.rect.midbottom)
-        # if self.on_ceiling:
-        #     if self.on_right:
-        #         self.rect = self.image.get_rect(topright = self.rect.topright)
-        #     elif self.on_left:
-        #         self.rect = self.image.get_rect(topleft = self.rect.topleft)
-        #     else:
-        #         self.rect = self.image.get_rect(midtop = self.rect.midtop)
-
     def _animate_particles(self) -> None:
         if self.animation_state == 'sprint' and self.on_ground:
             animation_frame = int(self.animation_frame) % len(self.particles_walk)
             particle = self.particles_walk[animation_frame]
-            particle_rect = particle.get_rect()
             if self.facing_right:
                 self.display_surface.blit(particle,
-                                          self.rect.bottomleft - pg.Vector2(0, particle_rect.height))
+                                          particle.get_rect(midbottom=self.rect.midbottom))
             else:
                 self.display_surface.blit(pg.transform.flip(particle, True, False),
-                                          self.rect.bottomright - pg.Vector2(particle_rect.width, particle_rect.height))
+                                          particle.get_rect(midbottom=self.rect.midbottom))
     
     def land(self) -> None:
         self.animation_frame = 0

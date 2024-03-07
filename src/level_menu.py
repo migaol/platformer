@@ -188,13 +188,12 @@ class LevelMenuPlayer(pg.sprite.Sprite):
         if self.animation_state == 'walk':
             animation_frame = int(self.animation_frame) % len(self.particles_walk)
             particle = self.particles_walk[animation_frame]
-            particle_rect = particle.get_rect()
             if self.facing_right:
                 self.display_surface.blit(particle,
-                                          self.rect.bottomleft - pg.Vector2(0, particle_rect.height))
+                                          particle.get_rect(midbottom=self.rect.midbottom))
             else:
                 self.display_surface.blit(pg.transform.flip(particle, True, False),
-                                          self.rect.bottomright - pg.Vector2(particle_rect.width, particle_rect.height))
+                                          particle.get_rect(midbottom=self.rect.midbottom))
     
     def _update_animation_state(self) -> None:
         if self.direction.x == 0 and self.direction.y == 0:

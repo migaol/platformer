@@ -150,7 +150,7 @@ class Level:
         player: Player = self.player.sprite
 
         if player.velocity.y == player.jump_speed:
-            self._create_player_jump_particles()
+            self.particle_sprites.add(ParticleEffect(self.player.sprite.rect, 'player_jumping'))
         
         player.update_gravity()
 
@@ -171,12 +171,12 @@ class Level:
             player.on_ground = False
             player.jumps = min(PLAYER_MAX_JUMPS-1, player.jumps) # disable ground jump when airborne
         if not player_was_on_ground and self.player.sprite.on_ground:
-            if player.animation_state != 'hurt':
-                player.land()
-            self._create_player_land_particles()
+            if player.animation_state != 'hurt': player.land()
+            self.particle_sprites.add(ParticleEffect(self.player.sprite.rect, 'player_landing'))
 
-    def _update_player_enemy_collision(self) -> None:
+    def _update_player_collisions(self) -> None:
         player: Player = self.player.sprite
+        
         enemy: Enemy
         for enemy in self.enemies.sprites():
             if enemy.rect.colliderect(player.rect) and player.animation_state != 'hurt':
@@ -188,19 +188,13 @@ class Level:
                     player.jump()
                     player.jumps += 1
                     enemy.kill()
-
-    def _update_player_gem_collision(self) -> None:
-        player: Player = self.player.sprite
+        
         gem: Gem
         for gem in self.gems.sprites():
             if gem.hitbox.collide_hitbox(gem.rect, player.rect):
                 self.collected_gems[gem.id] = True
-                self._create_gem_pickup_particles(gem)
+                self.particle_sprites.add(ParticleEffect(gem.rect, 'gem_pickup'))
                 gem.kill()
-
-    def _create_gem_pickup_particles(self, gem: Gem) -> None:
-        gem_particle = ParticleEffect(*gem.rect.center, 'gem_pickup')
-        self.particle_sprites.add(gem_particle)
 
     def _update_enemy_horizontal_movement(self) -> None:
         for enemy in self.enemies.sprites():
@@ -223,14 +217,6 @@ class Level:
                         enemy.rect.bottom = sprite.rect.top
                         enemy.velocity.y = 0
                         enemy.on_ground = True
-
-    def _create_player_jump_particles(self) -> None:
-        jump_particle = ParticleEffect(*self.player.sprite.rect.midbottom, 'player_jumping')
-        self.particle_sprites.add(jump_particle)
-
-    def _create_player_land_particles(self) -> None:
-        landing_particle = ParticleEffect(*self.player.sprite.rect.midbottom, 'player_landing')
-        self.particle_sprites.add(landing_particle)
 
     def debug_draw_hitbox(self, hitbox: pg.Rect, type: str, stroke: int = 4) -> None:
         if type == 'hitbox':
@@ -268,8 +254,7 @@ class Level:
         self.player.update()
         self._update_player_horizontal_movement()
         self._update_player_vertical_movement()
-        self._update_player_enemy_collision()
-        self._update_player_gem_collision()
+        self._update_player_collisions()
         self.player.draw(self.display_surface)
 
         self.particle_sprites.update(self.view_shift)

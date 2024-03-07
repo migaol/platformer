@@ -78,7 +78,7 @@ class VariableStaticBackgroundTile(StaticBackgroundTile):
 
 class LevelPortalBackgroundTile(VariableStaticBackgroundTile):
     def __init__(self, pos: pg.Vector2, size: int, level: int,
-                    surface_states: List[pg.Surface], initial_state: int = 0, font: str = FONT) -> None:
+                 surface_states: List[pg.Surface], initial_state: int = 0, font: str = FONT) -> None:
         super().__init__(pos, size, surface_states, initial_state)
         self.level = level
         self.font = pg.font.Font(font, TILE_SIZE//2)

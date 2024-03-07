@@ -118,10 +118,10 @@ class Player(pg.sprite.Sprite):
             particle_rect = particle.get_rect()
             if self.facing_right:
                 self.display_surface.blit(particle,
-                                        self.rect.bottomleft - pg.Vector2(0, particle_rect.height))
+                                          self.rect.bottomleft - pg.Vector2(0, particle_rect.height))
             else:
                 self.display_surface.blit(pg.transform.flip(particle, True, False),
-                                        self.rect.bottomright - pg.Vector2(particle_rect.width, particle_rect.height))
+                                          self.rect.bottomright - pg.Vector2(particle_rect.width, particle_rect.height))
     
     def land(self) -> None:
         self.animation_frame = 0

@@ -6,7 +6,7 @@ from leveldata import *
 from level import Level
 from level_menu import LevelMenu
 
-debug_mode = True
+debug_mode = False
 
 class Game:
     def __init__(self, surface: pg.Surface, debug_mode: bool = False) -> None:

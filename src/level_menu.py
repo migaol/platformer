@@ -7,6 +7,7 @@ from settings import *
 from leveldata import world_data
 from tile import *
 from bg import *
+from particles import EntityParticleEffect
 
 class LevelMenu:
     def __init__(self, surface: pg.Surface, current_world: int, debug_mode: bool = False) -> None:
@@ -130,6 +131,7 @@ class LevelMenu:
         
         self.player.update()
         self._update_move_player()
+        self.player.sprite.animate_particles()
         self.player.draw(self.display_surface)
 
 class LevelMenuPlayer(pg.sprite.Sprite):
@@ -142,7 +144,7 @@ class LevelMenuPlayer(pg.sprite.Sprite):
         self.animation_state = 'idle'
         self.animation_frame = 0
         self.image = self.animations['idle'][0]
-        self.rect = self.image.get_rect(topleft = pos)
+        self.rect = self.image.get_rect(topleft=pos)
 
         self.direction = pg.Vector2(0, 0)
         self.speed = PLAYER_MAX_MOMENTUM
@@ -160,7 +162,8 @@ class LevelMenuPlayer(pg.sprite.Sprite):
             self.animations[animation] = load.import_tilesheet(filepath + 'blue_' + animation + '.png')
     
     def _load_particle_assets(self) -> None:
-        self.particles_walk = load.import_tilesheet('./assets/particles/player_walk_dust.png')
+        self.particle_sprites = pg.sprite.Group()
+        self.particle_sprites.add(EntityParticleEffect('player_running', persistent=True))
 
     def _get_input(self) -> None:
         pressed = pg.key.get_pressed()
@@ -184,25 +187,16 @@ class LevelMenuPlayer(pg.sprite.Sprite):
         image = animation[int(animation_frame)]
         self.image = image if self.facing_right else pg.transform.flip(image, True, False)
 
-    def _animate_particles(self) -> None:
+    def animate_particles(self) -> None:
         if self.animation_state == 'walk':
-            animation_frame = int(self.animation_frame) % len(self.particles_walk)
-            particle = self.particles_walk[animation_frame]
-            if self.facing_right:
-                self.display_surface.blit(particle,
-                                          particle.get_rect(midbottom=self.rect.midbottom))
-            else:
-                self.display_surface.blit(pg.transform.flip(particle, True, False),
-                                          particle.get_rect(midbottom=self.rect.midbottom))
+            self.particle_sprites.update(self.rect, reversed=(not self.facing_right))
+            self.particle_sprites.draw(self.display_surface)
     
     def _update_animation_state(self) -> None:
-        if self.direction.x == 0 and self.direction.y == 0:
-            self.animation_state = 'idle'
-        else:
-            self.animation_state = 'walk'
+        if self.direction.x == 0 and self.direction.y == 0: self.animation_state = 'idle'
+        else:                                               self.animation_state = 'walk'
 
     def update(self) -> None:
         self._get_input()
         self._update_animation_state()
-        self._animate_particles()
         self._animate()

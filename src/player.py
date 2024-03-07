@@ -1,6 +1,7 @@
 import pygame as pg
 from settings import *
 import load
+from particles import EntityParticleEffect
 
 class Player(pg.sprite.Sprite):
     def __init__(self, pos: pg.Vector2, surface: pg.Surface) -> None:
@@ -40,7 +41,8 @@ class Player(pg.sprite.Sprite):
             self.animations[animation] = load.import_tilesheet(filepath + 'blue_' + animation + '.png')
     
     def _load_particle_assets(self) -> None:
-        self.particles_walk = load.import_tilesheet('./assets/particles/player_walk_dust.png')
+        self.particle_sprites = pg.sprite.Group()
+        self.particle_sprites.add(EntityParticleEffect('player_running', persistent=True))
 
     def get_input(self) -> None:
         pressed = pg.key.get_pressed()
@@ -89,14 +91,8 @@ class Player(pg.sprite.Sprite):
 
     def _animate_particles(self) -> None:
         if self.animation_state == 'sprint' and self.on_ground:
-            animation_frame = int(self.animation_frame) % len(self.particles_walk)
-            particle = self.particles_walk[animation_frame]
-            if self.facing_right:
-                self.display_surface.blit(particle,
-                                          particle.get_rect(midbottom=self.rect.midbottom))
-            else:
-                self.display_surface.blit(pg.transform.flip(particle, True, False),
-                                          particle.get_rect(midbottom=self.rect.midbottom))
+            self.particle_sprites.update(self.rect, reversed=(not self.facing_right))
+            self.particle_sprites.draw(self.display_surface)
     
     def land(self) -> None:
         self.animation_frame = 0

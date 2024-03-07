@@ -7,7 +7,7 @@ from settings import *
 import load
 from gui import Gui
 from player import Player
-from particles import ParticleEffect
+from particles import FreeParticleEffect
 from tile import *
 from bg import *
 from entity import *
@@ -145,7 +145,7 @@ class Level:
         player: Player = self.player.sprite
 
         if player.velocity.y == player.jump_speed:
-            self.particle_sprites.add(ParticleEffect(self.player.sprite.rect, 'player_jumping'))
+            self.particle_sprites.add(FreeParticleEffect(self.player.sprite.rect, 'player_jumping'))
         
         player.update_gravity()
 
@@ -167,7 +167,7 @@ class Level:
             player.jumps = min(PLAYER_MAX_JUMPS-1, player.jumps) # disable ground jump when airborne
         if not player_was_on_ground and self.player.sprite.on_ground:
             if player.animation_state != 'hurt': player.land()
-            self.particle_sprites.add(ParticleEffect(self.player.sprite.rect, 'player_landing'))
+            self.particle_sprites.add(FreeParticleEffect(self.player.sprite.rect, 'player_landing'))
 
     def _update_player_collisions(self) -> None:
         player: Player = self.player.sprite
@@ -188,7 +188,7 @@ class Level:
         for gem in self.gems.sprites():
             if gem.hitbox.collide_hitbox(gem.rect, player.rect):
                 self.collected_gems[gem.id] = True
-                self.particle_sprites.add(ParticleEffect(gem.rect, 'gem_pickup'))
+                self.particle_sprites.add(FreeParticleEffect(gem.rect, 'gem_pickup'))
                 gem.kill()
 
     def _update_enemy_horizontal_movement(self) -> None:

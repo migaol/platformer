@@ -160,7 +160,7 @@ class LevelMenuPlayer(pg.sprite.Sprite):
             self.animations[animation] = load.import_tilesheet(filepath + 'blue_' + animation + '.png')
     
     def _load_particle_assets(self) -> None:
-        self.particles_walk = load.import_tilesheet('./assets/player/walk_dust.png')
+        self.particles_walk = load.import_tilesheet('./assets/particles/player_walk_dust.png')
 
     def _get_input(self) -> None:
         pressed = pg.key.get_pressed()

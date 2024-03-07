@@ -77,6 +77,9 @@ class Level:
         self.player = pg.sprite.GroupSingle()
         self.enemies = pg.sprite.Group()
         self.gems = pg.sprite.Group()
+        self.collected_gems = {TileID.GEM_RED: False,
+                               TileID.GEM_BLUE: False,
+                               TileID.GEM_GREEN: False}
         for ri,r in enumerate(layout):
             for ci,c in enumerate(r):
                 pos = pg.Vector2(ci*TILE_SIZE, ri*TILE_SIZE)
@@ -186,6 +189,19 @@ class Level:
                     player.jumps += 1
                     enemy.kill()
 
+    def _update_player_gem_collision(self) -> None:
+        player: Player = self.player.sprite
+        gem: Gem
+        for gem in self.gems.sprites():
+            if gem.hitbox.collide_hitbox(gem.rect, player.rect):
+                self.collected_gems[gem.id] = True
+                self._create_gem_pickup_particles(gem)
+                gem.kill()
+
+    def _create_gem_pickup_particles(self, gem: Gem) -> None:
+        gem_particle = ParticleEffect(*gem.rect.center, 'gem_pickup')
+        self.particle_sprites.add(gem_particle)
+
     def _update_enemy_horizontal_movement(self) -> None:
         for enemy in self.enemies.sprites():
             enemy.move()
@@ -209,13 +225,11 @@ class Level:
                         enemy.on_ground = True
 
     def _create_player_jump_particles(self) -> None:
-        x, y = self.player.sprite.rect.midbottom
-        jump_particle = ParticleEffect(x, y, 'player_jumping')
+        jump_particle = ParticleEffect(*self.player.sprite.rect.midbottom, 'player_jumping')
         self.particle_sprites.add(jump_particle)
 
     def _create_player_land_particles(self) -> None:
-        x, y = self.player.sprite.rect.midbottom
-        landing_particle = ParticleEffect(x, y, 'player_landing')
+        landing_particle = ParticleEffect(*self.player.sprite.rect.midbottom, 'player_landing')
         self.particle_sprites.add(landing_particle)
 
     def debug_draw_hitbox(self, hitbox: pg.Rect, type: str, stroke: int = 4) -> None:
@@ -255,6 +269,7 @@ class Level:
         self._update_player_horizontal_movement()
         self._update_player_vertical_movement()
         self._update_player_enemy_collision()
+        self._update_player_gem_collision()
         self.player.draw(self.display_surface)
 
         self.particle_sprites.update(self.view_shift)

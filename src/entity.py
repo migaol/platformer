@@ -24,3 +24,4 @@ class Gem(AnimatedTile):
         else: gem_id = frames = []
         super().__init__(pos, width, height, frames)
         self.hitbox = Hitbox(0, 0, *ENTITY_GEM_HITBOX, alignment='center')
+        self.id = gem_id

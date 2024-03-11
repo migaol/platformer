@@ -78,13 +78,16 @@ class Level:
         self.collected_gems = {TileID.GEM_RED: False,
                                TileID.GEM_BLUE: False,
                                TileID.GEM_GREEN: False}
+        self.powerups = pg.sprite.Group()
         for ri,r in enumerate(layout):
             for ci,c in enumerate(r):
                 pos = pg.Vector2(ci*TILE_SIZE, ri*TILE_SIZE)
                 if c == TileID.PLAYER:
                     self.player.add(Player(pos, self.display_surface))
-                if c in [TileID.GEM_RED, TileID.GEM_BLUE, TileID.GEM_GREEN]:
+                elif c in TileIDGroup.GEMS.value:
                     self.gems.add(Gem(pos, c))
+                elif c in TileIDGroup.POWERUPS.value:
+                    self.powerups.add(Powerup(pos, c))
                 elif c == 'z':
                     enemy = TestEnemy(pos, self.display_surface)
                     self.enemies.add(enemy)
@@ -190,6 +193,12 @@ class Level:
                 self.collected_gems[gem.id] = True
                 self.particle_sprites.add(FreeParticleEffect(gem.rect, 'gem_pickup'))
                 gem.kill()
+        
+        powerup: Powerup
+        for powerup in self.powerups.sprites():
+            if powerup.hitbox.collide_hitbox(powerup.rect, player.rect):
+                self.particle_sprites.add(FreeParticleEffect(powerup.rect, 'powerup_pickup'))
+                powerup.kill()
 
     def _update_enemy_horizontal_movement(self) -> None:
         for enemy in self.enemies.sprites():
@@ -241,6 +250,8 @@ class Level:
 
         self.gems.update(self.view_shift, self.global_animation_frame)
         self.gems.draw(self.display_surface)
+        self.powerups.update(self.view_shift, self.global_animation_frame)
+        self.powerups.draw(self.display_surface)
 
         self.player.update()
         self._update_player_horizontal_movement()

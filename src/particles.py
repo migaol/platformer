@@ -35,6 +35,10 @@ class FreeParticleEffect(ParticleEffect):
                 self.frames = load.import_tilesheet('./assets/particles/gem_pickup.png')
                 self.image = self.frames[self.frame_index]
                 self.rect = self.image.get_rect(center = rect.center)
+            case 'powerup_pickup':
+                self.frames = load.import_tilesheet('./assets/particles/powerup_pickup.png', frame_width=64, frame_height=128)
+                self.image = self.frames[self.frame_index]
+                self.rect = self.image.get_rect(center = rect.center)
 
 class EntityParticleEffect(ParticleEffect):
     def __init__(self, type: str, persistent: bool = False, **kwargs) -> None:

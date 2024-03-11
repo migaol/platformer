@@ -23,5 +23,13 @@ class Gem(AnimatedTile):
         elif gem_id == TileID.GEM_GREEN:    frames = load.import_tilesheet('assets/items/gem_green.png')
         else: frames = []
         super().__init__(pos, frames)
-        self.hitbox = Hitbox(0, 0, *ENTITY_GEM_HITBOX, alignment='center')
+        self.hitbox = Hitbox(0, 0, *ENTITY_PICKUP_HITBOX, alignment='center')
         self.id = gem_id
+
+class Powerup(AnimatedTile):
+    def __init__(self, pos: pg.Vector2, powerup_id: str) -> None:
+        if   powerup_id == TileID.POTION_HEALTH:     frames = load.import_tilesheet('assets/items/potion_health.png')
+        else: frames = []
+        super().__init__(pos, frames)
+        self.hitbox = Hitbox(0, 0, *ENTITY_PICKUP_HITBOX, alignment='center')
+        self.id = powerup_id

@@ -1,5 +1,5 @@
 import pygame as pg
-from enum import StrEnum
+from enum import Enum, StrEnum
 
 # render
 VERTICAL_TILES = 14
@@ -16,6 +16,9 @@ class TileID(StrEnum):
     CRATE_CROSS = '7'
     CRATE_SQUARE = '8'
     CRATE_SLASH = '9'
+class TileIDGroup(Enum):
+    GEMS = [TileID.GEM_RED, TileID.GEM_BLUE, TileID.GEM_GREEN]
+    POWERUPS = [TileID.POTION_HEALTH]
 
 # font
 FONT = "./assets/font/Pixellari.ttf"
@@ -68,7 +71,7 @@ PLAYER_TERMINAL_VELOCITY = 10
 PLAYER_HITBOX = (48,48) # TODO: implement
 
 # entity behavior
-ENTITY_GEM_HITBOX = (TILE_SIZE//2, TILE_SIZE//2)
+ENTITY_PICKUP_HITBOX = (TILE_SIZE//2, TILE_SIZE//2)
 
 # enemy behavior
 ENEMY_DUMMY_SPEED = 5

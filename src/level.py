@@ -179,8 +179,7 @@ class Level:
         for enemy in self.enemies.sprites():
             if enemy.rect.colliderect(player.rect) and player.animation_state != 'hurt':
                 if enemy.collide_lethal_hitbox(player.rect):
-                    player.damage()
-                    self.gui.hp_bar.lose_hp(1)
+                    if player.damage(1): self.gui.hp_bar.lose_hp(1)
                 else:
                     player.rect.bottom = enemy.rect.top
                     player.jump()
@@ -198,6 +197,7 @@ class Level:
         for powerup in self.powerups.sprites():
             if powerup.hitbox.collide_hitbox(powerup.rect, player.rect):
                 self.particle_sprites.add(FreeParticleEffect(powerup.rect, 'powerup_pickup'))
+                if player.heal(1): self.gui.hp_bar.gain_hp(1)
                 powerup.kill()
 
     def _update_enemy_horizontal_movement(self) -> None:

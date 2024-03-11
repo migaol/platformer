@@ -37,8 +37,11 @@ class HealthBar:
         self.max_hp = self.player.max_hp
 
     def lose_hp(self, amount: int) -> None:
-        self.fill.change_val(self.player.current_hp, amount)
+        self.fill.change_val(self.player.current_hp, amount, True)
         self.lost.reduce_val(self.player.current_hp, amount, self.max_hp)
+
+    def gain_hp(self, amount: int) -> None:
+        self.fill.change_val(self.player.current_hp, amount, False, max_val=self.max_hp)
     
     def draw(self) -> None:
         self.base.draw()
@@ -67,9 +70,12 @@ class AttributeBar:
             self.val_change_target = 0
             self.val_change_amount = 0
 
-        def change_val(self, new_val: int, amount: int) -> None:
-            self.val_change_target = new_val
-            self.val_change_amount = amount
+        def change_val(self, new_val: int, amount: int, animate: bool, max_val: int = 0) -> None:
+            if animate:
+                self.val_change_target = new_val
+                self.val_change_amount = amount
+            else:
+                self.image = pg.transform.scale(self.image, ((new_val/max_val)*self.full_width, self.height))
         
         def animate_change(self, animation_frame: float, transition_frames: int, max_val: int) -> None:
             if animation_frame <= transition_frames:

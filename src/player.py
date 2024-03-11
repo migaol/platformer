@@ -15,7 +15,7 @@ class Player(pg.sprite.Sprite):
         self.image: pg.Surface = self.animations['idle'][0]
         self.rect = self.image.get_rect(topleft=pos)
 
-        self.current_hp = PLAYER_HEALTH
+        self.current_hp = 5
         self.max_hp = PLAYER_MAX_HEALTH
 
         self.velocity = pg.Vector2(0, 0)
@@ -112,10 +112,17 @@ class Player(pg.sprite.Sprite):
         else:
             if self.animation_frame >= len(self.animations['land']): self.animation_state = 'idle'
 
-    def damage(self) -> None:
-        self.current_hp -= 1
+    def heal(self, amount: int) -> bool:
+        if self.current_hp == self.max_hp: return False
+        self.current_hp += amount
+        return True
+
+    def damage(self, amount: int) -> bool:
+        if self.current_hp == 0: return False
+        self.current_hp -= amount
         self.animation_frame = 0
         self.animation_state = 'hurt'
+        return True
 
     def update(self) -> None:
         self.get_input()
